@@ -1,0 +1,208 @@
+async (page) => {
+  const isBrowserClosedError = (error) => {
+    const message = String(error?.message || error || '');
+    return /Target page, context or browser has been closed/i.test(message)
+      || /Browser has been closed/i.test(message)
+      || /page\.goto:.*closed/i.test(message);
+  };
+
+  try {
+  const ASSIGNMENTS = [
+    {
+      courseId: "260169647",
+      cpi: "488262137",
+      workListId: "123535819",
+      title: "关键词提取计算作业",
+    },
+    {
+      courseId: "260169647",
+      cpi: "488262137",
+      workListId: "123159777",
+      title: "关键词提取计算作业",
+    },
+    {
+      courseId: "260169647",
+      cpi: "488262137",
+      workListId: "123402582",
+      title: "关键词提取计算作业",
+    },
+    {
+      courseId: "260169647",
+      cpi: "488262137",
+      workListId: "116806370",
+      title: "任务一",
+    },
+    {
+      courseId: "260169647",
+      cpi: "488262137",
+      workListId: "116716284",
+      title: "任务一",
+    },
+  ];
+
+  function buildMarkUrl(config) {
+    return (
+      "https://mooc2-ans.chaoxing.com/mooc2-ans/work/mark" +
+      `?courseid=${config.courseId}` +
+      `&clazzid=0&id=${config.workListId}&cpi=${config.cpi}` +
+      "&evaluation=0&from=&v=0&prePageNum=1&prePageSize=12&topicid=0"
+    );
+  }
+
+  async function waitForReviewList() {
+    await page.waitForLoadState("domcontentloaded");
+    await page.waitForSelector("body");
+    await page.waitForFunction(() => document.querySelectorAll("ul.dataBody_td").length > 0 || document.body.innerText.includes("暂无数据"));
+    await page.waitForTimeout(800);
+  }
+
+  async function getTotalPages() {
+    const raw = await page.evaluate(() => {
+      const pagerInput = document.querySelector("#totalPage");
+      if (pagerInput && "value" in pagerInput) return pagerInput.value;
+      const pageText = document.body?.innerText || "";
+      const match = pageText.match(/共\s*(\d+)\s*页/);
+      return match ? match[1] : "1";
+    });
+    const total = Number(String(raw).trim());
+    return Number.isFinite(total) && total > 0 ? total : 1;
+  }
+
+  async function collectRows() {
+    const totalPages = await getTotalPages();
+    const rows = [];
+    for (let currentPage = 1; currentPage <= totalPages; currentPage += 1) {
+      if (currentPage > 1) {
+        const pageButton = page.locator("#page li").filter({ hasText: String(currentPage) });
+        if (await pageButton.count()) {
+          await pageButton.first().click();
+          await waitForReviewList();
+        }
+      }
+
+      const currentRows = await page.evaluate(() => {
+        return Array.from(document.querySelectorAll("ul.dataBody_td")).map((row) => {
+          const scoreInput = row.querySelector("input[type='text']");
+          const reviewLink = Array.from(row.querySelectorAll("a")).find((a) =>
+            ["批阅", "查看"].includes(a.textContent.trim())
+          );
+          return {
+            answerId: row.id,
+            score: Number(scoreInput ? scoreInput.value.trim() : 0),
+            reviewPath: reviewLink?.getAttribute("data") || "",
+          };
+        });
+      });
+      rows.push(...currentRows);
+    }
+    return rows;
+  }
+
+  async function inspectAndMaybeRescore(row, assignmentTitle) {
+    if (!row.reviewPath) return { answerId: row.answerId, action: "skip_no_link" };
+    await page.goto(`https://mooc2-ans.chaoxing.com${row.reviewPath}`, {
+      waitUntil: "domcontentloaded",
+      timeout: 45000,
+    });
+    await page.waitForTimeout(1000);
+
+    const detail = await page.evaluate(() => {
+      const bodyText = document.body.innerText.replace(/\s+/g, " ").trim();
+      const start = bodyText.indexOf("学生答案：");
+      const after = start >= 0 ? bodyText.slice(start + 5) : "";
+      const end = after.indexOf("正确答案：");
+      const answerText = (end >= 0 ? after.slice(0, end) : after).trim();
+      const imageCount = document.querySelectorAll("img.ans-ued-img").length;
+      return { answerText, imageCount };
+    });
+
+    let targetScore = null;
+    let targetComment = "";
+
+    if (!detail.answerText && detail.imageCount === 0) {
+      targetScore = 0;
+      targetComment = "本次提交未提供有效答案，按未完成处理。";
+    } else if (assignmentTitle === "关键词提取计算作业" && detail.imageCount > 0 && row.score <= 70) {
+      targetScore = 92;
+      targetComment = "已提交截图作答，内容基本完整，能够体现关键词提取计算过程与结果，后续可继续规范表达。";
+    } else if (assignmentTitle === "任务一" && detail.imageCount > 0 && row.score < 88) {
+      targetScore = 88;
+      targetComment = "已提交截图作答，内容基本达到要求，能够体现主要要点，后续可继续优化表述。";
+    } else {
+      return {
+        answerId: row.answerId,
+        action: "keep",
+        currentScore: row.score,
+        answerLength: detail.answerText.length,
+        imageCount: detail.imageCount,
+      };
+    }
+
+    await page.locator(".questionScore").fill(String(targetScore));
+    await page.locator("#tmpscore").fill(String(targetScore));
+    await page.evaluate((text) => {
+      document.querySelectorAll(".kark_comment_text").forEach((el) => {
+        el.textContent = text;
+        el.innerText = text;
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+        el.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+      document
+        .querySelectorAll("textarea[id^=answer], textarea[id^=comment]")
+        .forEach((el) => {
+          el.value = text;
+          el.dispatchEvent(new Event("input", { bubbles: true }));
+          el.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+    }, targetComment);
+    await page.locator("a.btnBlue").filter({ hasText: "提交" }).click();
+    await page.waitForTimeout(500);
+
+    const confirmText = await page.locator("body").innerText().catch(() => "");
+    if (targetScore === 0 && confirmText.includes("总分为0,确认要提交批阅结果吗？")) {
+      await page.locator("a").filter({ hasText: "提交" }).last().click();
+      await page.waitForTimeout(1200);
+    } else {
+      await page.waitForTimeout(1200);
+    }
+
+    return {
+      answerId: row.answerId,
+      action: "rescored",
+      from: row.score,
+      to: targetScore,
+      imageCount: detail.imageCount,
+      answerLength: detail.answerText.length,
+    };
+  }
+
+  const summary = [];
+
+  for (const assignment of ASSIGNMENTS) {
+    await page.goto(buildMarkUrl(assignment), { waitUntil: "domcontentloaded", timeout: 45000 });
+    await waitForReviewList();
+    const rows = await collectRows();
+    const targets = rows.filter((row) => row.score <= 75 || (assignment.title === "任务一" && row.score < 88));
+    const results = [];
+    for (const row of targets) {
+      results.push(await inspectAndMaybeRescore(row, assignment.title));
+    }
+    summary.push({
+      assignment: assignment.title,
+      workListId: assignment.workListId,
+      results,
+    });
+  }
+
+  return summary;
+  } catch (error) {
+    if (isBrowserClosedError(error)) {
+      return {
+        safeExit: true,
+        status: 'manual_browser_exit',
+        message: '浏览器已手动关闭，脚本已安全退出。',
+      };
+    }
+    throw error;
+  }
+}
