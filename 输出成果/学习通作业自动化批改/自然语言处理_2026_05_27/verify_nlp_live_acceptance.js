@@ -1,0 +1,104 @@
+async (page) => {
+  const isBrowserClosedError = (error) => {
+    const message = String(error?.message || error || '');
+    return /Target page, context or browser has been closed/i.test(message)
+      || /Browser has been closed/i.test(message)
+      || /page\.goto:.*closed/i.test(message);
+  };
+
+  try {
+  const COURSE_ID = "260169647";
+  const CPI = "488262137";
+  const TARGETS = [
+    { className: "人工智能3班", title: "关键词提取计算作业", workListId: "123535819" },
+    { className: "人工智能4班", title: "关键词提取计算作业", workListId: "123159777" },
+    { className: "人工智能6班", title: "关键词提取计算作业", workListId: "123402582" },
+    { className: "人工智能3班", title: "第五章-复习题", workListId: "122632984" },
+    { className: "人工智能6班", title: "第五章-复习题", workListId: "123035669" },
+    { className: "人工智能3班", title: "任务一", workListId: "116806370" },
+    { className: "人工智能6班", title: "任务一", workListId: "116716284" },
+  ];
+
+  async function collectItems() {
+    return await page.locator("body").evaluate(() => {
+      return [...document.querySelectorAll("[id^=work]")]
+        .map((item) => ({
+          id: item.id.replace(/^work/, ""),
+          text: item.innerText.replace(/\s+/g, " ").trim(),
+        }))
+        .filter((item) => item.id);
+    });
+  }
+
+  await page.goto(
+    `https://mooc2-ans.chaoxing.com/mooc2-ans/work/list?courseid=${COURSE_ID}&selectClassid=0&cpi=${CPI}&v=0`,
+    { waitUntil: "domcontentloaded", timeout: 45000 }
+  );
+  await page.waitForTimeout(1200);
+
+  const all = [];
+  for (const pageNumber of ["1", "2", "3", "4", "5"]) {
+    const pageButton = page.locator("#page li").filter({ hasText: pageNumber });
+    if (await pageButton.count()) {
+      await pageButton.first().click();
+      await page.waitForTimeout(900);
+      all.push(...(await collectItems()));
+    }
+  }
+
+  const seen = new Set();
+  const unique = all.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+
+  const targetResults = TARGETS.map((target) => {
+    const matched = unique.find((item) => item.id === target.workListId);
+    if (!matched) {
+      return {
+        ...target,
+        found: false,
+        pendingText: null,
+        ok: false,
+        reason: "missing_work_list_entry",
+      };
+    }
+
+    const pendingText = matched.text.match(/\d+待批/)?.[0] || "0待批";
+    const hasTitle = matched.text.includes(target.title);
+    const hasClass = matched.text.includes(target.className);
+    const ok = hasTitle && hasClass && pendingText === "0待批";
+
+    return {
+      ...target,
+      found: true,
+      pendingText,
+      ok,
+      reason: ok
+        ? "ok"
+        : !hasTitle
+          ? "title_mismatch"
+          : !hasClass
+            ? "class_mismatch"
+            : "pending_not_zero",
+    };
+  });
+
+  return {
+    courseId: COURSE_ID,
+    cpi: CPI,
+    ok: targetResults.every((item) => item.ok),
+    targetResults,
+  };
+  } catch (error) {
+    if (isBrowserClosedError(error)) {
+      return {
+        safeExit: true,
+        status: 'manual_browser_exit',
+        message: '浏览器已手动关闭，脚本已安全退出。',
+      };
+    }
+    throw error;
+  }
+}
