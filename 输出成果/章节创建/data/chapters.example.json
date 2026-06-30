@@ -1,0 +1,17 @@
+[
+  {
+    "sourceTitle": "任务一：文本向量化的离散化表示",
+    "targetParentTitle": "文本向量化",
+    "targetTitle": "任务二：文本向量化的分布式表示",
+    "expectedCode": "7.2",
+    "copyCards": true,
+    "tabs": [
+      "任务教学目标",
+      "任务分析与效果",
+      "知识点讲解",
+      "任务实施",
+      "微课视频",
+      "任务总结与拓展"
+    ]
+  }
+]

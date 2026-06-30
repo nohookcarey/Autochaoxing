@@ -1,0 +1,30 @@
+const KNOWN_CHAPTER_TESTS = [
+  { num: '2.1', title: '2.1 任务一：在线语料库的获取', taskCount: '3', taskNum: 4, knowledgeId: '1116687320', chapterId: '1116687320', workLibraryId: 'a480161963784b8a9bfefcc5e7322158' },
+  { num: '2.2', title: '2.2 任务二：网络在线语料分析', taskCount: '2', taskNum: 3, knowledgeId: '1117267284', chapterId: '1117267284', workLibraryId: '709f9b1b608842be933c1bdc2a643e30' },
+  { num: '2.3', title: '2.3 任务三：构建电影评论语料库', taskCount: '2', taskNum: 3, knowledgeId: '1117491288', chapterId: '1117491288', workLibraryId: '99f0ab86974f4eb2832c470fc2dec687' },
+  { num: '3.1', title: '3.1 任务一：正则表达式函数', taskCount: '3', taskNum: 4, knowledgeId: '1141387074', chapterId: '1141387074', workLibraryId: '44ae8c575ee84179a158797f39853597' },
+  { num: '3.2', title: '3.2 任务二：正则表达式元字符', taskCount: '3', taskNum: 4, knowledgeId: '1141542799', chapterId: '1141542799', workLibraryId: '074bde9a4e4148b18e9182fe2ba9b00b' },
+  { num: '3.3', title: '3.3 任务三：正则表达式应用', taskCount: '1', taskNum: 4, knowledgeId: '1143639654', chapterId: '1143639654', workLibraryId: '90f2eaca5b2b4f5ab1a51a18ce9a1f09' },
+  { num: '4.1', title: '4.1 任务一：基于规则分词的应用实例', taskCount: '3', taskNum: 4, knowledgeId: '1152285209', chapterId: '1152285209', workLibraryId: 'fb2a8711fde043508be43064af23bdec' },
+  { num: '4.2', title: '4.2 任务二：基于统计分词的应用实例', taskCount: '3', taskNum: 3, knowledgeId: '1153945848', chapterId: '1153945848', workLibraryId: '22836e4f22c645498007f0941465e7ec' },
+  { num: '4.3', title: '4.3 任务三：基于深度学习分词的应用实例', taskCount: '3', taskNum: 3, knowledgeId: '1156862756', chapterId: '1156862756', workLibraryId: 'a765d812c1d1464bb6ec7311bf7ca2ba' },
+  { num: '5.1', title: '5.1 任务一：基于 HMM 的词性标注', taskCount: '2', taskNum: 2, knowledgeId: '1159663328', chapterId: '1159663328', workLibraryId: '85303e8896e24eecb05dda2b20b102a1' },
+  { num: '5.2', title: '5.2 任务二：基于深度学习的词性标注', taskCount: '2', taskNum: 2, knowledgeId: '1159665842', chapterId: '1159665842', workLibraryId: '219272d0bce24945ba9e58afbff1c258' },
+  { num: '5.3', title: '5.3 任务三：基于 CRF 模型的中文命名实体识别', taskCount: '2', taskNum: 2, knowledgeId: '1159666503', chapterId: '1159666503', workLibraryId: '9fcc9323dfc74daa83a7ba1619f1e277' },
+  { num: '5.4', title: '5.4 任务四：基于深度学习的中文命名实体识别', taskCount: '3', taskNum: 2, knowledgeId: '1159670639', chapterId: '1159670639', workLibraryId: '1e6e8c72f0454303bd99203324577395' },
+  { num: '5.5', title: '5.5 任务五：基于 sklearn-cfrsuite 库中文命名实体识别', taskCount: '2', taskNum: 2, knowledgeId: '1159671161', chapterId: '1159671161', workLibraryId: '3e2fec875ed6469497cfc462d81f2c61' },
+  { num: '6.1', title: '6.1 任务一：基于统计的关键词提取', taskCount: '3', taskNum: 4, knowledgeId: '1167113319', chapterId: '1167113319', workLibraryId: '304a41fc9ce241b99b4ceccada7f3dbe' },
+  { num: '6.2', title: '6.2 任务二：基于语义的关键词提取', taskCount: '2', taskNum: 3, knowledgeId: '1167113461', chapterId: '1167113461', workLibraryId: '3d11319003764c69890e4a785e02bb45' },
+  { num: '7.1', title: '7.1 任务一：文本向量化的离散化表示', taskCount: '3', taskNum: 3, knowledgeId: '1173054653', chapterId: '1173054653', workLibraryId: 'df222f30cb6f4a3992bdcd97ee64d3b4' },
+  { num: '7.2', title: '7.2 任务二：文本向量化的分布式表示 Word2Vec', taskCount: '2', taskNum: 3, knowledgeId: '1173837196', chapterId: '1173837196', workLibraryId: 'b7261d9d33bd4b1ebfb4e177607d0e4a' },
+  { num: '7.3', title: '7.3 任务三：文本向量化的分布式表示Doc2Vec', taskCount: '2', taskNum: 3, knowledgeId: '1173911286', chapterId: '1173911286', workLibraryId: '5df00cdcaccb4bccbe20824d5ba09557' },
+  { num: '7.4', title: '7.4 任务四：文本相似度计算', taskCount: '4', taskNum: 3, knowledgeId: '1173912450', chapterId: '1173912450', workLibraryId: 'd0df374ee09d437fae031aee1e84f3aa' },
+  { num: '8.2', title: '8.2 任务二：中文文本聚类', taskCount: '2', taskNum: 3, knowledgeId: '1173949064', chapterId: '1173949064', workLibraryId: 'ba2393417981408db07b4e207cf7b5c9' },
+  { num: '9.1', title: '9.1 任务一：文本情感分析的方法', taskCount: '2', taskNum: 4, knowledgeId: '1173922966', chapterId: '1173922966', workLibraryId: '88e95f04e46745379b0a1f3e67643972' },
+  { num: '9.2', title: '9.2 任务二：基于情感词典的文本情感分析', taskCount: '1', taskNum: 3, knowledgeId: '1173923123', chapterId: '1173923123', workLibraryId: '8bd1cb34ff174f9fbddc966c4029aa65' },
+  { num: '9.3', title: '9.3 任务三：基于机器学习的文本情感分析', taskCount: '1', taskNum: 3, knowledgeId: '1173923197', chapterId: '1173923197', workLibraryId: '827aab3e24a5464fb18d9f69b7775d38' },
+];
+
+module.exports = {
+  KNOWN_CHAPTER_TESTS,
+};
