@@ -1,0 +1,16 @@
+{
+  "name": "xuexitong-chapter-builder",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "学习通课程二级章节自动创建工具",
+  "scripts": {
+    "start": "node src/main.js",
+    "check": "node --check src/main.js && node --check src/lib/config.js && node --check src/lib/logger.js && node --check src/lib/data-loader.js && node --check src/lib/selectors.js && node --check src/lib/xuexitong-client.js",
+    "dry-run": "node src/main.js --dry-run"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "playwright": "^1.55.0"
+  }
+}

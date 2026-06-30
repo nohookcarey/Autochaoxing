@@ -1,0 +1,16 @@
+{
+  "name": "xuexitong-chapter-test-grading",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "validate": "./validate_reuse_tripwire.sh",
+    "discover": "node discover_all_chapter_tests.js",
+    "grade": "node grade_chapter_test.js",
+    "audit": "node audit_pending_chapter_tests.js",
+    "all": "./run_chapter_workflow.sh all",
+    "fix:zero:known": "node fix_zero_scores_known.js"
+  },
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}

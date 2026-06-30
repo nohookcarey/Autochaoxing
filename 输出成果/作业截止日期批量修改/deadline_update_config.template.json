@@ -1,0 +1,13 @@
+{
+  "courseName": "课程名称",
+  "courseId": "课程ID",
+  "cpi": "课程CPI",
+  "courseWorkListUrl": "https://mooc2-ans.chaoxing.com/mooc2-ans/work/list?courseid=课程ID&selectClassid=0&cpi=课程CPI&v=0",
+  "targetDate": "2026-06-03",
+  "keepOriginalTime": true,
+  "targetClasses": ["班级1", "班级2"],
+  "singleAssignment": {
+    "title": "作业标题",
+    "className": "班级1"
+  }
+}

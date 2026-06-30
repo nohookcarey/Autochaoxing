@@ -149,6 +149,7 @@ vite.config.ts.timestamp-*
 auth.json
 storage-state.json
 playwright/.auth/
+storage/
 
 # Playwright 运行产物
 playwright-report/
@@ -159,3 +160,4 @@ blob-report/
 *.tmp
 *.bak
 工作区/
+**/deadline_update_config.json

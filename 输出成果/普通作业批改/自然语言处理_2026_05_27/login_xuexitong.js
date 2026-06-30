@@ -12,8 +12,13 @@ async (page) => {
     { waitUntil: "domcontentloaded", timeout: 45000 }
   );
 
-  await page.getByPlaceholder("手机号/超星号").fill("REDACTED");
-  await page.getByPlaceholder("学习通密码").fill("REDACTED");
+  const username = process.env.XTX_USERNAME || "";
+  const password = process.env.XTX_PASSWORD || "";
+  if (!username || !password) {
+    throw new Error("请通过 XTX_USERNAME 和 XTX_PASSWORD 环境变量提供学习通账号信息。");
+  }
+  await page.getByPlaceholder("手机号/超星号").fill(username);
+  await page.getByPlaceholder("学习通密码").fill(password);
   await page.getByRole("button", { name: "登录" }).click();
   await page.waitForLoadState("domcontentloaded");
   await page.waitForTimeout(1500);
