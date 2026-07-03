@@ -1,0 +1,33 @@
+{
+  "course": {
+    "courseId": "260169647",
+    "clazzId": "141397001",
+    "cpi": "488262137",
+    "url": "https://mooc2-ans.chaoxing.com/mooc2-ans/mycourse/tch?courseid=260169647&clazzid=141397001&cpi=488262137"
+  },
+  "classes": [
+    {
+      "name": "2024人工智能1班",
+      "classId": "141397001",
+      "sheetPath": "/ABS/PATH/2024人工智能1班-课堂考核及成绩记载表.xls",
+      "outputPath": "/ABS/PATH/2024人工智能1班-课堂考核及成绩记载表-已填写签到异常.xls"
+    },
+    {
+      "name": "2024人工智能2班",
+      "classId": "141396985",
+      "sheetPath": "/ABS/PATH/2024人工智能2班-课堂考核及成绩记载表.xls",
+      "outputPath": "/ABS/PATH/2024人工智能2班-课堂考核及成绩记载表-已填写签到异常.xls"
+    }
+  ],
+  "symbolMap": {
+    "公假": "口",
+    "病假": "小",
+    "事假": "△",
+    "旷课": "O",
+    "缺勤": "O",
+    "未签到": "O",
+    "迟到": "迟",
+    "早退": "早退"
+  },
+  "maxAttendanceSlots": 18
+}
