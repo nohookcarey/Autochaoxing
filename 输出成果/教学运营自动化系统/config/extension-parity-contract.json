@@ -1,0 +1,59 @@
+{
+  "source": "src/App.jsx",
+  "items": [
+    {
+      "name": "多课程新增、编辑与切换",
+      "sourceTokens": ["添加课程", "保存课程", "切换到此课程"],
+      "extensionFiles": ["extension/popup/popup.html", "extension/popup/popup.js"],
+      "extensionTokens": ["new-course", "save-course", "course-select", "addCourse", "saveCourse"]
+    },
+    {
+      "name": "课程连接检测",
+      "sourceTokens": ["准备连接核验", "只读扫描前核验"],
+      "extensionFiles": ["extension/popup/popup.html", "extension/popup/popup.js", "extension/background.js"],
+      "extensionTokens": ["check-connection", "check-active-connection", "checkConnection"]
+    },
+    {
+      "name": "作业待批扫描",
+      "sourceTokens": ["扫描待批作业", "buildAssignmentPreflight"],
+      "extensionFiles": ["extension/popup/popup.html", "extension/background.js"],
+      "extensionTokens": ["scan-active-assignment-page", "scanAllAssignmentPages", "scannedPages"]
+    },
+    {
+      "name": "本地对话任务入口",
+      "sourceTokens": ["AI 助手", "askAssistant"],
+      "extensionFiles": ["extension/popup/popup.html", "extension/popup/popup.js"],
+      "extensionTokens": ["send-command", "handleCommand", "AI 助手"]
+    },
+    {
+      "name": "运行记录与结果回看",
+      "sourceTokens": ["运行记录", "RunRecords"],
+      "extensionFiles": ["extension/popup/popup.html", "extension/popup/popup.js", "extension/popup/run-history.js"],
+      "extensionTokens": ["run-filter", "historyPayload", "filterRuns", "summarize"]
+    },
+    {
+      "name": "脱敏演示模式",
+      "sourceTokens": ["脱敏演示模式", "toggleDemoMode"],
+      "extensionFiles": ["extension/popup/popup.html", "extension/popup/popup.js", "extension/popup/demo-mode.js"],
+      "extensionTokens": ["toggle-demo-mode", "toggleDemoMode", "demoCourse"]
+    },
+    {
+      "name": "脱敏报告导出",
+      "sourceTokens": ["导出运行报告", "exportDemoReport"],
+      "extensionFiles": ["extension/popup/popup.html", "extension/popup/popup.js"],
+      "extensionTokens": ["export-report", "exportReport", "脱敏演示报告"]
+    },
+    {
+      "name": "系统架构图导出",
+      "sourceTokens": ["导出架构图", "buildArchitectureSvg"],
+      "extensionFiles": ["extension/popup/popup.html", "extension/popup/popup.js", "extension/popup/demo-mode.js"],
+      "extensionTokens": ["export-architecture", "exportArchitecture", "architectureSvg"]
+    },
+    {
+      "name": "作业改期预演、确认与回读",
+      "sourceTokens": ["脱敏演示 · 写入预演", "确认并演示回读"],
+      "extensionFiles": ["extension/popup/popup.html", "extension/popup/popup.js", "extension/background.js"],
+      "extensionTokens": ["show-deadline-form", "prepare-assignment-deadline-update", "confirm-assignment-deadline-update", "cancel-assignment-deadline-update"]
+    }
+  ]
+}

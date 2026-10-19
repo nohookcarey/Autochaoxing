@@ -1,0 +1,24 @@
+{
+  "files": [
+    {
+      "path": "extension/vendor/pdfjs/pdf.mjs",
+      "sha256": "081d3b6f426d38a8029766f8839f505e9cbf2c81a71d62c26eada142e6c21ae4"
+    },
+    {
+      "path": "extension/vendor/pdfjs/pdf.worker.mjs",
+      "sha256": "5e9f76bd5e65fbd1602b29fc50e50490aeeacd34a715b2282b73f7e8029242e0"
+    },
+    {
+      "path": "extension/vendor/xlsx/xlsx.full.min.js",
+      "sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41"
+    }
+  ],
+  "versions": {
+    "sheetjs": "0.20.3",
+    "pdfjs": "4.10.38"
+  },
+  "upstream": {
+    "sheetjs": "https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js",
+    "pdfjs": "https://www.npmjs.com/package/pdfjs-dist/v/4.10.38"
+  }
+}
