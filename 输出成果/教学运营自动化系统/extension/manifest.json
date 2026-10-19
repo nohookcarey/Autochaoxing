@@ -1,0 +1,93 @@
+{
+  "manifest_version": 3,
+  "name": "教学运营助手（本机）",
+  "version": "0.41.1",
+  "description": "教师批改辅助：待批核验、评分卡、图像AI建议、集中审核、教师确认提交与独立回读。",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "webNavigation",
+    "scripting",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://*.chaoxing.com/*"
+  ],
+  "optional_host_permissions": [
+    "https://*/*"
+  ],
+  "icons": {
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_title": "教学运营助手",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "128": "icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.chaoxing.com/*"
+      ],
+      "js": [
+        "grading-batch-core.js",
+        "content/ai-grading-core.js",
+        "content/grading-adapter-core.js",
+        "content/followup-roster-core.js",
+        "content/grading-adapter-page.js",
+        "content/navigation-core.js",
+        "content/navigation-page.js",
+        "content/assignment-scan-core.js",
+        "content/deadline-update-core.js",
+        "content/assignment-page.js",
+        "content/chapter-test-scan-core.js",
+        "content/chapter-test-page.js",
+        "content/attendance-scan-core.js",
+        "content/attendance-page.js",
+        "content/course-overview-scan-core.js",
+        "content/course-overview-page.js",
+        "content/score-overview-scan-core.js",
+        "content/score-overview-page.js",
+        "content/chapter-structure-scan-core.js",
+        "content/chapter-structure-page.js",
+        "content/connection-check-scan-core.js",
+        "content/connection-check-page.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "https://*.chaoxing.com/*work/library/review-work*"
+      ],
+      "js": [
+        "grading-batch-core.js",
+        "content/grading-adapter-core.js",
+        "content/ai-grading-core.js",
+        "attachment-extract.js",
+        "content/ai-grading-page.js"
+      ],
+      "css": [
+        "content/ai-grading.css"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "vendor/pdfjs/*"
+      ],
+      "matches": [
+        "https://*.chaoxing.com/*"
+      ]
+    }
+  ],
+  "minimum_chrome_version": "114"
+}

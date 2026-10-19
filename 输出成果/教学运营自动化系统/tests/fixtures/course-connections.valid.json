@@ -1,0 +1,15 @@
+{
+  "profiles": [
+    {
+      "courseKey": "demo-course",
+      "courseName": "演示课程",
+      "courseId": "0",
+      "cpi": "0",
+      "classNames": ["演示班"],
+      "enabledModules": ["assignment"],
+      "entryPoints": {
+        "assignment": "教师端普通作业列表"
+      }
+    }
+  ]
+}
