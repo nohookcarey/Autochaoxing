@@ -1,0 +1,16 @@
+node_modules/
+dist/
+config/course-connections.local.json
+config/course-imports.local.json
+
+# Local evidence, credentials and historical backups are never publishable.
+.DS_Store
+.backup-*/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+tmp/
+release/
+coverage/

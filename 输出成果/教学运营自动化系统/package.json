@@ -1,0 +1,47 @@
+{
+  "name": "prototype",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "local": "node scripts/start-local.mjs",
+    "test": "npm run test:demo && npm run test:audit && npm run test:assistant && npm run test:assignment-scanner && npm run test:profiles && npm run test:gateway && npm run test:extension && npm run test:teaching-support && npm run test:parity && npm run test:sites && npm run test:codex && npm run test:publication",
+    "test:teaching-support": "node --test tests/extension-teaching-support.test.mjs",
+    "build": "vite build && node scripts/prepare-sites-build.mjs",
+    "preview": "vite preview",
+    "test:sites": "node --test tests/sites-worker.test.mjs",
+    "validate:profiles": "node scripts/validate-course-profiles.mjs",
+    "test:profiles": "node scripts/validate-course-profiles.mjs tests/fixtures/course-connections.valid.json",
+    "gateway": "node server/start-gateway.mjs",
+    "test:gateway": "node --test tests/task-gateway.test.mjs",
+    "test:assignment-scanner": "node scripts/validate-assignment-scanner.mjs && node --test tests/assignment-scanner.test.mjs",
+    "test:assistant": "node --test tests/assistant-intents.test.mjs",
+    "test:audit": "node --test tests/local-audit.test.mjs",
+    "test:demo": "node --test tests/demo-mode.test.mjs tests/demo-workflow.test.mjs tests/agent-blueprint.test.mjs",
+    "test:extension": "node scripts/validate-extension.mjs && node --test tests/extension-assignment-scan.test.mjs tests/extension-chapter-test-scan.test.mjs tests/extension-attendance-scan.test.mjs tests/extension-course-overview-scan.test.mjs tests/extension-score-overview-scan.test.mjs tests/extension-chapter-structure-scan.test.mjs tests/extension-connection-check.test.mjs tests/extension-deadline-update.test.mjs tests/extension-deadline-form.test.mjs tests/extension-demo-mode.test.mjs tests/extension-course-state.test.mjs tests/extension-run-history.test.mjs tests/extension-navigation.test.mjs tests/extension-background-navigation.test.mjs tests/extension-ai-grading.test.mjs tests/extension-ai-grading-background.test.mjs tests/extension-attachment-extract.test.mjs tests/extension-student-scan.test.mjs tests/extension-sheet-filling.test.mjs tests/extension-scan-cache.test.mjs tests/extension-grading-batch.test.mjs tests/extension-grading-teaching.test.mjs tests/extension-teaching-followup.test.mjs tests/extension-grading-report.test.mjs tests/extension-task-design.test.mjs tests/extension-grading-adapter.test.mjs tests/extension-teacher-lifecycle.test.mjs",
+    "test:parity": "node scripts/validate-extension-parity.mjs",
+    "verify:release": "node scripts/verify-extension-release.mjs",
+    "test:batch": "node --test tests/extension-grading-batch.test.mjs tests/extension-grading-teaching.test.mjs",
+    "test:followup": "node --test tests/extension-teaching-followup.test.mjs",
+    "test:report": "node --test tests/extension-grading-report.test.mjs",
+    "test:task-design": "node --test tests/extension-task-design.test.mjs",
+    "test:codex": "node --test tests/codex-bridge.test.mjs",
+    "codex:bridge": "node scripts/start-codex-bridge.mjs",
+    "test:lifecycle": "node --test tests/extension-teacher-lifecycle.test.mjs",
+    "test:publication": "node --test tests/publication.test.mjs",
+    "verify:publication": "node scripts/verify-publication.mjs",
+    "pretest": "npm run build"
+  },
+  "dependencies": {
+    "@tabler/icons-react": "^3.46.0",
+    "@vitejs/plugin-react": "5.0.4",
+    "pdfjs-dist": "^4.10.38",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "vite": "6.4.4"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
