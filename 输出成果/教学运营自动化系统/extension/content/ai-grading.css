@@ -1,0 +1,64 @@
+#learningtong-ai-grading-panel {
+  position: fixed;
+  right: 16px;
+  top: 16px;
+  z-index: 2147483647;
+  width: 280px;
+  padding: 12px 14px;
+  border: 1px solid #d6e2f2;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 6px 24px rgba(30, 60, 100, 0.16);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 12px;
+  color: #33445c;
+}
+#learningtong-ai-grading-panel .latg-title { font-weight: 700; font-size: 13px; color: #1f4f8b; margin-bottom: 6px; }
+#learningtong-ai-grading-panel .latg-hint { line-height: 1.6; color: #63758d; margin-bottom: 10px; }
+#learningtong-ai-grading-panel .latg-button {
+  width: 100%;
+  min-height: 34px;
+  border: none;
+  border-radius: 7px;
+  background: #1f6ec5;
+  color: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+}
+#learningtong-ai-grading-panel .latg-button:hover { background: #185a9f; }
+#learningtong-ai-grading-panel .latg-apply-button { margin-top: 8px; background: #1d7a46; }
+#learningtong-ai-grading-panel .latg-apply-button:hover { background: #17643a; }
+#learningtong-ai-grading-panel .latg-status { margin-top: 10px; line-height: 1.6; }
+#learningtong-ai-grading-panel .latg-status.latg-ok { color: #1d7a46; }
+#learningtong-ai-grading-panel .latg-status.latg-warn { color: #9a6a14; }
+#learningtong-ai-grading-panel .latg-status.latg-error { color: #b0413b; }
+#learningtong-ai-grading-panel .latg-close {
+  position: absolute;
+  right: 6px;
+  top: 4px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: #8494ab;
+  font-size: 16px;
+  cursor: pointer;
+}
+#learningtong-ai-grading-panel .latg-close:hover { color: #33445c; }
+#learningtong-ai-grading-panel .latg-attach-bar { margin-top: 10px; padding: 6px 8px; border-radius: 6px; background: #f0f5fc; color: #4a5f7d; line-height: 1.5; word-break: break-all; }
+#learningtong-ai-grading-panel .latg-rubric { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #dbe5f2; }
+#learningtong-ai-grading-panel .latg-rubric-status { color: #52657d; margin-bottom: 6px; }
+#learningtong-ai-grading-panel .latg-rubric-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+#learningtong-ai-grading-panel .latg-mini-button { min-height: 26px; padding: 0 10px; border: 1px solid #c9d8ec; border-radius: 6px; background: #f4f8fd; color: #1f5f9e; font-size: 12px; cursor: pointer; }
+#learningtong-ai-grading-panel .latg-mini-button:hover { background: #e6f0fb; }
+#learningtong-ai-grading-panel .latg-mini-primary { background: #1f6ec5; border-color: #1f6ec5; color: #ffffff; }
+#learningtong-ai-grading-panel .latg-mini-primary:hover { background: #185a9f; }
+#learningtong-ai-grading-panel .latg-mini-danger { color: #a3422f; border-color: #eccdc4; background: #fdf4f1; }
+#learningtong-ai-grading-panel .latg-rubric-editor { margin-top: 8px; }
+#learningtong-ai-grading-panel .latg-rubric-list { display: grid; gap: 6px; max-height: 240px; overflow: auto; }
+#learningtong-ai-grading-panel .latg-rubric-row { display: grid; grid-template-columns: 58px 46px 1fr 20px; gap: 4px; align-items: center; }
+#learningtong-ai-grading-panel .latg-input { min-height: 26px; padding: 0 6px; border: 1px solid #ccd8e8; border-radius: 5px; font-size: 12px; color: #33445c; box-sizing: border-box; width: 100%; }
+#learningtong-ai-grading-panel .latg-rubric-row .latg-input:not(.latg-input-name):not(.latg-input-score) { grid-column: 1 / 4; }
+#learningtong-ai-grading-panel .latg-row-remove { width: 20px; height: 20px; border: none; background: transparent; color: #a5b3c8; font-size: 14px; cursor: pointer; line-height: 1; }
+#learningtong-ai-grading-panel .latg-row-remove:hover { color: #b0413b; }
+#learningtong-ai-grading-panel .latg-rubric-editor .latg-rubric-actions { margin-top: 8px; }

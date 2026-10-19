@@ -1,0 +1,15 @@
+{
+  "profiles": [
+    {
+      "courseKey": "course-example",
+      "courseName": "本机课程示例",
+      "courseId": "<仅填写数字课程ID>",
+      "cpi": "<仅填写数字CPI>",
+      "classNames": ["示例班"],
+      "enabledModules": ["assignment", "chapter", "attendance", "score"],
+      "entryPoints": {
+        "assignment": "教师端普通作业列表"
+      }
+    }
+  ]
+}
