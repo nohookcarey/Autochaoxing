@@ -45,6 +45,28 @@ test('native material resolves verified object, HTTPS CDN with no credentials, e
  const {fetcher,calls}=fetchFixture();const r=await A.readEmbeddedMaterial(nativeFixture(),url,identity,nativeAttachment(),fetcher);
  assert.equal(r.dataBase64,'UEsD');assert.equal(calls[0].options.credentials,'include');assert.equal(calls[1].options.credentials,'omit');assert.equal(calls[1].options.redirect,'error');assert.ok(calls[1].href.startsWith('https://d0.cldisk.com/'));
 });
+function imageFixture({src='https://p.ananas.chaoxing.com/star3/origin/'+'a'.repeat(32),role='学生答案'}={}) {
+ const doc=fixture({questions:1,empty:true});
+ const answer=doc.querySelectorAll('.mark_item, .mark_item1')[0].querySelector('.mark_answer_key');
+ const image={getAttribute:name=>name==='src'?src:null};
+ answer.querySelectorAll=selector=>selector==='img[src]'?[image]:[];
+ doc.createRange=()=>({selectNodeContents(){},setEndBefore(){},toString:()=>role+'：'});
+ return doc;
+}
+test('native inline answer image uses the bound original-file resolver instead of cross-origin image fetch',async()=>{
+ const doc=imageFixture();const snapshot=A.readSnapshot(doc,url,identity);const attachment=snapshot.questions[0].attachments[0];
+ assert.equal(snapshot.complete,true);assert.equal(attachment.kind,'image');assert.equal(attachment.resolver,'chaoxing-status');assert.equal(attachment.role,'学生答案');
+ assert.equal(attachment.href,'https://mooc1.chaoxing.com/ananas/status/'+'a'.repeat(32));
+ const {fetcher,calls}=fetchFixture();const result=await A.readEmbeddedMaterial(doc,url,identity,attachment,fetcher);
+ assert.equal(result.dataBase64,'UEsD');assert.equal(calls.length,2);assert.equal(calls[1].options.credentials,'omit');assert.equal(calls[1].options.redirect,'error');
+});
+test('inline image resolution excludes reference material, altered routes and mismatched descriptors',async()=>{
+ for(const options of [{role:'正确答案'},{src:'https://other.chaoxing.com/star3/origin/'+'a'.repeat(32)},{src:'https://p.ananas.chaoxing.com/star3/origin/'+'a'.repeat(32)+'?extra=1'},{src:'https://p.ananas.chaoxing.com/star3/origin/'+'a'.repeat(32)+'#fragment'},{src:'https://p.ananas.chaoxing.com/star3/thumb/'+'a'.repeat(32)}]){
+  assert.equal(A.readSnapshot(imageFixture(options),url,identity).questions[0].attachments[0].resolver,undefined);
+ }
+ const doc=imageFixture();const attachment=A.readSnapshot(doc,url,identity).questions[0].attachments[0];const {fetcher,calls}=fetchFixture();
+ await assert.rejects(A.readEmbeddedMaterial(doc,url,identity,{...attachment,objectId:'c'.repeat(32)},fetcher),/不一致/);assert.equal(calls.length,0);
+});
 test('material rejected when descriptor or submission does not match current answer',async()=>{
  const {fetcher,calls}=fetchFixture();await assert.rejects(A.readEmbeddedMaterial(nativeFixture(),url,identity,{...nativeAttachment(),objectId:'c'.repeat(32)},fetcher),/不一致/);assert.equal(calls.length,0);
  await assert.rejects(A.readEmbeddedMaterial(nativeFixture(),url,{...identity,answerId:'other'},nativeAttachment(),fetcher),/身份/);

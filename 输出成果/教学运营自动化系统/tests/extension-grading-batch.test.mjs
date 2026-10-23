@@ -86,19 +86,20 @@ test("cancelled request does not retry or accept a late response", async () => {
   assert.equal(calls, 1);
 });
 
-function transport() {
-  const data = {}, pages = [], counters = { submit: 0, verifyScores: [] }; let listener;
+function transport({ delayedVerification = false, verificationError = false } = {}) {
+  const data = {}, pages = [], counters = { submit: 0, verifyScores: [], updates: [], removed: [], created: [] }; let listener;
   const store = { async get(keys) { return Object.fromEntries((Array.isArray(keys) ? keys : [keys]).map(k => [k, structuredClone(data[k])])); }, async set(entries) { Object.assign(data, structuredClone(entries)); }, async remove(keys) { for (const k of Array.isArray(keys) ? keys : [keys]) delete data[k]; } };
   const c = { ...context, loadAiConfig: async () => ({}), hasAiOriginPermission: async () => true };
   c.globalThis = c;
   c.chrome = { runtime: { id: "test-extension", getURL: p => `chrome-extension://test-extension/${p}`, lastError: null, onMessage: { addListener: fn => { listener = fn; } } }, storage: { session: store }, tabs: {
-    update(id, options, cb) { pages.push(options.url); cb({ id }); }, get(id, cb) { cb({ id, status: "complete", url: pages.at(-1) }); },
+    create(options, cb) { counters.created.push(options); cb({ id: 3 }); }, remove(id, cb) { counters.removed.push(id); cb(); },
+    update(id, options, cb) { counters.updates.push({id, url: options.url}); pages.push(options.url); cb({ id }); }, get(id, cb) { cb({ id, status: "complete", url: pages.at(-1) }); },
     sendMessage(id, message, options, cb) {
       if (message.type === "batch-page-list") cb({ ok: true, data: { totalPages: 1, entries: [{ identity: sample().item.identity, status: "pending" }] } });
       else if (message.type === "batch-page-read") cb({ ok: true, data: sample().item.snapshot });
       else if (message.type === "batch-page-prepare") cb({ ok: true, data: { prepared: true } });
       else if (message.type === "batch-page-submit") { counters.submit++; cb({ ok: true, data: { dispatched: true } }); }
-      else if (message.type === "batch-page-verify") { counters.verifyScores.push(message.score); cb({ ok: true, data: { verified: true, found: true, list: { totalPages: 1 } } }); }
+      else if (message.type === "batch-page-verify") { counters.verifyScores.push(message.score); cb(verificationError ? {ok:false,reason:"fixture read failure"} : { ok: true, data: { verified: !delayedVerification || counters.verifyScores.length > 1, found: true, list: { totalPages: 1 } } }); }
     },
   } };
   vm.runInNewContext(readFileSync(new URL("../extension/content/grading-adapter-core.js", import.meta.url), "utf8"), c);
@@ -187,3 +188,23 @@ test('independent readback uses the dispatched score after rubric changes and wo
  B.setRubrics(submitted.batch,{'q-a':{dimensions:[{name:'新规则',maxScore:100,criteria:'新的教师标准'}]}});const restarted=transport();await restarted.seed(submitted.batch);
  const verified=await restarted.send({type:'batch-verify',id:batch.id,key:item.key});assert.equal(verified.ok,true,verified.reason);assert.equal(restarted.counters.verifyScores.at(-1),80);assert.equal(t.counters.submit,1);assert.equal(restarted.counters.submit,0);
 });
+
+ test("deferred native submission is verified in a separate tab without interrupting its save", async () => {
+  const t = transport({delayedVerification:true}), {batch,item} = sample(); batch.platformTabId=2; batch.workspaceTabId=1; B.confirmItem(batch,item); await t.seed(batch);
+  const prepared=await t.send({type:"batch-prepare-submit",id:batch.id,key:item.key});
+  await t.send({type:"batch-submit",id:batch.id,token:prepared.token});
+  t.counters.updates.length=0;
+  const result=await t.send({type:"batch-verify",id:batch.id,key:item.key});
+  assert.equal(result.ok,true,result.reason); assert.equal(result.batch.items[0].state,B.states.verified);
+  assert.equal(t.counters.submit,1); assert.equal(t.counters.verifyScores.length,2);
+  assert.ok(t.counters.updates.every(u=>u.id===3)); assert.deepEqual(t.counters.removed,[2]);
+  assert.equal(result.batch.platformTabId,3);
+  const read=await t.send({type:'batch-read',id:batch.id,key:item.key});assert.equal(read.ok,true,read.reason);
+  assert.equal(t.counters.updates.at(-1).id,3); // delayed redirect in retired tab cannot interrupt the next item
+  assert.equal(t.data["gradingBatch:"+batch.id].verificationTabId,undefined);
+ });
+ test("failed independent readback closes its tab and never dispatches another submit", async()=>{
+  const t=transport({verificationError:true}),{batch,item}=sample();batch.platformTabId=2;batch.workspaceTabId=1;B.confirmItem(batch,item);await t.seed(batch);
+  const prepared=await t.send({type:"batch-prepare-submit",id:batch.id,key:item.key});await t.send({type:"batch-submit",id:batch.id,token:prepared.token});
+  const result=await t.send({type:"batch-verify",id:batch.id,key:item.key});assert.equal(result.ok,false);assert.equal(t.counters.submit,1);assert.deepEqual(t.counters.removed,[3]);assert.equal(t.data["gradingBatch:"+batch.id].items[0].state,B.states.uncertain);
+ });
