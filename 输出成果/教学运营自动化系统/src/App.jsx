@@ -1,11 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
 import DemoWalkthrough from "./DemoWalkthrough";
-import {
-  IconAlertTriangle, IconArrowRight, IconBook2, IconChevronDown, IconChevronUp,
-  IconClipboardCheck, IconFileText, IconMessageCircle2, IconNotebook, IconPencil,
-  IconDownload, IconPlus, IconReportAnalytics, IconSchool, IconSend, IconSettings, IconShieldCheck,
-  IconSparkles, IconUserCheck, IconX,
-} from "@tabler/icons-react";
+import IconAlertTriangle from "@tabler/icons-react/dist/esm/icons/IconAlertTriangle.mjs";
+import IconArrowRight from "@tabler/icons-react/dist/esm/icons/IconArrowRight.mjs";
+import IconBook2 from "@tabler/icons-react/dist/esm/icons/IconBook2.mjs";
+import IconChevronDown from "@tabler/icons-react/dist/esm/icons/IconChevronDown.mjs";
+import IconChevronUp from "@tabler/icons-react/dist/esm/icons/IconChevronUp.mjs";
+import IconClipboardCheck from "@tabler/icons-react/dist/esm/icons/IconClipboardCheck.mjs";
+import IconFileText from "@tabler/icons-react/dist/esm/icons/IconFileText.mjs";
+import IconMessageCircle2 from "@tabler/icons-react/dist/esm/icons/IconMessageCircle.mjs";
+import IconNotebook from "@tabler/icons-react/dist/esm/icons/IconNotebook.mjs";
+import IconPencil from "@tabler/icons-react/dist/esm/icons/IconPencil.mjs";
+import IconDownload from "@tabler/icons-react/dist/esm/icons/IconDownload.mjs";
+import IconPlus from "@tabler/icons-react/dist/esm/icons/IconPlus.mjs";
+import IconReportAnalytics from "@tabler/icons-react/dist/esm/icons/IconReportAnalytics.mjs";
+import IconSchool from "@tabler/icons-react/dist/esm/icons/IconSchool.mjs";
+import IconSend from "@tabler/icons-react/dist/esm/icons/IconSend.mjs";
+import IconSettings from "@tabler/icons-react/dist/esm/icons/IconSettings.mjs";
+import IconShieldCheck from "@tabler/icons-react/dist/esm/icons/IconShieldCheck.mjs";
+import IconSparkles from "@tabler/icons-react/dist/esm/icons/IconSparkles.mjs";
+import IconUserCheck from "@tabler/icons-react/dist/esm/icons/IconUserCheck.mjs";
+import IconX from "@tabler/icons-react/dist/esm/icons/IconX.mjs";
 import { acquisitionStates, buildAssignmentPreflight, buildRunRecord } from "./task-preflight";
 import { resolveAssistantIntent } from "./assistant-intents";
 import { loadRunRecords, prependRunRecord, RUN_RECORD_STORE_KEY } from "./local-audit";
