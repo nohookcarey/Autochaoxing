@@ -138,14 +138,14 @@
     }
     if (message.type === "batch-forget") {
       const batch = await load(message.id);
-      if (batch) { try { await tabCall("remove", batch.platformTabId); } catch {} }
+      if (batch) { for (const id of [batch.platformTabId, batch.verificationTabId].filter(Number.isInteger)) { try { await tabCall("remove", id); } catch {} } }
       await chrome.storage.session.remove([keyFor(message.id), "gradingActiveBatch"]);
       return { ok: true };
     }
     if (message.type === "batch-save") {
       const old = await boundBatch(message.batch.id);
       if (old.workspaceTabId && old.workspaceTabId !== sender.tab?.id) throw new Error("本次批改由另一个工作台管理。");
-      if (B.canonical(old.scope) !== B.canonical(message.batch.scope) || old.platformTabId !== message.batch.platformTabId || old.items.some(i => [B.states.submitting, B.states.verified, B.states.uncertain].includes(i.state) && B.canonical(i) !== B.canonical(message.batch.items.find(j => j.key === i.key)))) throw new Error("不能改变已提交条目或当前范围。");
+      if (B.canonical(old.scope) !== B.canonical(message.batch.scope) || old.platformTabId !== message.batch.platformTabId || old.verificationTabId !== message.batch.verificationTabId || old.items.some(i => [B.states.submitting, B.states.verified, B.states.uncertain].includes(i.state) && B.canonical(i) !== B.canonical(message.batch.items.find(j => j.key === i.key)))) throw new Error("不能改变已提交条目或当前范围。");
       await save(message.batch); return { ok: true };
     }
     const batch = await boundBatch(message.id);
@@ -221,17 +221,39 @@
       const total = item.submittedPlan ? item.submittedPlan.total : B.reviewedTotal(batch, item);
       if (!Number.isFinite(total) || total < 0 || total > item.snapshot.totalMax || (item.submittedPlan && B.identityKey(item.submittedPlan.identity) !== item.key)) throw new Error("原提交核验依据无效，请人工核对平台。");
       const verificationStarted = Date.now();
-      for (let p = 1, pages = 1; p <= pages; p++) {
-        if (Date.now() - verificationStarted > 180000) throw new Error("回读超时，结果不确定，不能自动重提。");
-        await navigate(batch.platformTabId, listUrl(batch, p));
-        const r = await page(batch.platformTabId, { type: "batch-page-verify", scope: batch.scope, identity: item.identity, score: total });
-        if (!r?.ok) throw new Error(r?.reason || "回读失败。");
-        pages = r.data.list.totalPages;
-        if (r.data.verified) { item.state = B.states.verified; item.reason = "同一提交的分数与已批状态已独立核验。"; await save(batch); return { ok: true, batch }; }
-        if (r.data.found) break;
+      // Native markAction defers saving. Never navigate the submission tab away
+      // to verify: that cancels the platform's pending timer/request.
+      if (batch.verificationTabId) { try { await tabCall("remove", batch.verificationTabId); } catch {} }
+      const verificationTab = await tabCall("create", { url: "about:blank", active: false });
+      batch.verificationTabId = verificationTab.id; await save(batch);
+      try {
+        for (let attempt = 0; attempt < 3; attempt++) {
+          if (attempt) await sleep(1000);
+          for (let p = 1, pages = 1; p <= pages; p++) {
+            if (Date.now() - verificationStarted > 180000) throw new Error("回读超时，结果不确定，不能自动重提。");
+            await navigate(verificationTab.id, listUrl(batch, p));
+            const r = await page(verificationTab.id, { type: "batch-page-verify", scope: batch.scope, identity: item.identity, score: total });
+            if (!r?.ok) throw new Error(r?.reason || "回读失败。");
+            pages = r.data.list.totalPages;
+            if (r.data.verified) {
+              item.state = B.states.verified; item.reason = "同一提交的分数与已批状态已独立核验。";
+              // The platform also schedules a delayed redirect after saving.
+              // Continue from the verified list tab, retiring that old timer.
+              const submittedTabId = batch.platformTabId;
+              batch.platformTabId = verificationTab.id;
+              delete batch.verificationTabId; await save(batch);
+              try { await tabCall("remove", submittedTabId); } catch {}
+              return { ok: true, batch };
+            }
+            if (r.data.found) break;
+          }
+        }
+        item.state = B.states.uncertain; item.reason = "未核实到相同提交的预期分数及已批状态，请人工核对；不会自动重提。"; await save(batch);
+        return { ok: false, batch, reason: item.reason };
+      } finally {
+        if (batch.platformTabId !== verificationTab.id) { try { await tabCall("remove", verificationTab.id); } catch {} }
+        delete batch.verificationTabId; await save(batch);
       }
-      item.state = B.states.uncertain; item.reason = "未核实到相同提交的预期分数及已批状态，请人工核对；不会自动重提。"; await save(batch);
-      return { ok: false, batch, reason: item.reason };
     }
     throw new Error("未知批改任务。");
   }
