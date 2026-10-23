@@ -100,7 +100,19 @@
       for (const image of answer?.querySelectorAll("img[src]") || []) {
         const href = new URL(image.getAttribute("src"), url).href;
         if (!trustedUrl(href)) throw new Error("答案图片来源无法核验，需人工复核。");
-        if (!attachments.some(a => a.href === href)) attachments.push({ href, fileName: `答案图片${index + 1}-${attachments.length + 1}.png`, kind: "image", role: roleOf(image) });
+        const role = roleOf(image), source = new URL(href);
+        const nativeImage = source.hostname === "p.ananas.chaoxing.com" && !source.port && !source.username && !source.password && !source.search && !source.hash && source.pathname.match(/^\/star3\/origin\/([a-f0-9]{32})$/i);
+        const fileName = `答案图片${index + 1}-${attachments.length + 1}.png`;
+        // The native image renders in <img> but disallows cross-origin fetch.
+        // Resolve only its exact, observed original-image route via the same
+        // identity-bound status/CDN path already used for native DOCX files.
+        if (nativeImage && role === "学生答案") {
+          const objectId = nativeImage[1];
+          const attachment = { href: new URL(`/ananas/status/${objectId}`, url).href, objectId, resolver: "chaoxing-status", fileName, kind: "image", role };
+          const direct = attachments.findIndex(a => a.href === href);
+          if (direct >= 0) attachments.splice(direct, 1);
+          if (!attachments.some(a => a.href === attachment.href)) attachments.push(attachment);
+        } else if (!attachments.some(a => a.href === href)) attachments.push({ href, fileName, kind: "image", role });
       }
       return { id: B.norm(id), inputId, question, studentAnswer, referenceAnswer, unresolvedMaterials, maxScore, automatic, existingScore: automatic && B.norm(input?.value) ? Number(input.value) : null, attachments, editable: Boolean((input && input.id && !input.readOnly && !input.disabled) || expected.kind === "chapter") };
     });
