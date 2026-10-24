@@ -49,6 +49,8 @@
 
   const ATTACHMENT_KINDS = [
     { kind: "code", exts: /\.(py|js|ts|java|c|cpp|cc|h|hpp|cs|go|rs|rb|php|sh|bat|ps1|sql|r|m|swift|kt|scala|ipynb|vue|jsx|tsx|html|css)$/i },
+    { kind: "archive", exts: /\.zip$/i },
+    { kind: "spreadsheet", exts: /\.xlsx$/i },
     { kind: "pdf", exts: /\.pdf$/i },
     { kind: "word", exts: /\.(docx|doc)$/i },
     { kind: "text", exts: /\.(txt|md|markdown|csv|json|xml|log|yml|yaml|ini|tex)$/i },
