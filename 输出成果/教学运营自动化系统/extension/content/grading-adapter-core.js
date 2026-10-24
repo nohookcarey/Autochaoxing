@@ -73,7 +73,7 @@
       const automatic = Boolean(input && (input.readOnly || input.disabled)) && /单选|多选|判断|客观/.test(question + text(box.querySelector(".questionType")));
       const studentNode = answer?.querySelector(".studentAns .stuAnswerWords, .studentAns dd");
       const referenceNode = answer?.querySelector(".hiddenAnswer dd, .colorGreen dd");
-      const studentAnswer = studentNode ? B.norm(studentNode.textContent) : extract("学生答案", "正确答案");
+      let studentAnswer = studentNode ? B.norm(studentNode.textContent) : extract("学生答案", "正确答案");
       const referenceAnswer = referenceNode ? B.norm(referenceNode.textContent) : extract("正确答案", "");
       // Never mistake embedded viewer metadata for the original file's contents.
       const embedded = [...answer?.querySelectorAll("iframe.attach-iframe, .editor-iframe iframe") || []];
@@ -86,7 +86,7 @@
           const source = new URL(meta.source, url);
           if (!trustedUrl(source.href) || source.origin !== new URL(url).origin || source.pathname !== "/ananas/common-modules/attachment/insertCloud.html" || source.search || !/^[a-f0-9]{32}$/i.test(meta.objectId) || meta.role !== "学生答案") continue;
           const kind = globalThis.LearningTongAiGrading.classifyAttachment(frame.getAttribute("filename") || `材料.${frame.getAttribute("filetype") || ""}`);
-          if (!["word", "pdf", "text", "image"].includes(kind)) continue;
+          if (!["word", "pdf", "text", "code", "image", "archive", "spreadsheet"].includes(kind)) continue;
           attachments.push({ href: new URL(`/ananas/status/${meta.objectId}`, source).href, objectId: meta.objectId, resolver: "chaoxing-status", fileName: frame.getAttribute("filename") || `材料.${frame.getAttribute("filetype")}`, kind, role: meta.role });
           meta.resolved = true;
         } catch {}
@@ -97,6 +97,21 @@
         try { const range = doc.createRange(); range.selectNodeContents(answer); range.setEndBefore(element); const prefix = range.toString(); const student = prefix.lastIndexOf("学生答案"), reference = prefix.lastIndexOf("正确答案"); return reference > student ? "参考答案" : student >= 0 ? "学生答案" : "材料角色未定位"; } catch { return "材料角色未定位"; }
       };
       for (const a of attachments.filter(a => !a.resolver)) { const anchor = [...box.querySelectorAll("a[href]")].find(n => new URL(n.getAttribute("href"), url).href === a.href); a.role = anchor ? roleOf(anchor) : "材料角色未定位"; }
+      // A normal web-page link is answer evidence, not a downloadable HTML
+      // program. Preserve its exact href in the identity-bound answer text.
+      // Named HTML files and explicit file/download controls remain materials.
+      const webLinks = [];
+      for (let n = attachments.length - 1; n >= 0; n--) {
+        const a = attachments[n];
+        if (a.resolver || a.role !== "学生答案" || !["code", "other"].includes(a.kind)) continue;
+        const anchor = [...box.querySelectorAll("a[href]")].find(x => new URL(x.getAttribute("href"), url).href === a.href);
+        const label = B.norm(anchor?.textContent).replace(/\s*(下载|预览|查看)\s*$/g, "");
+        const namedFile = !/^https?:\/\//i.test(label) && /\.html?$/i.test(label);
+        const fileControl = anchor?.hasAttribute?.("download") || /^(?:下载|预览|查看)(?:文件|附件)?$/.test(B.norm(anchor?.textContent)) || anchor?.closest?.("[data-file-id], .attachment, .attach, .file-list");
+        if (!anchor || namedFile || fileControl || !/\.html?$/i.test(new URL(a.href).pathname)) continue;
+        webLinks.unshift(a.href); attachments.splice(n, 1);
+      }
+      if (webLinks.length) studentAnswer = B.norm(studentAnswer + "\n作答网页链接：\n" + [...new Set(webLinks)].join("\n"));
       for (const image of answer?.querySelectorAll("img[src]") || []) {
         const href = new URL(image.getAttribute("src"), url).href;
         if (!trustedUrl(href)) throw new Error("答案图片来源无法核验，需人工复核。");
