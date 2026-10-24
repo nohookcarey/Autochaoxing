@@ -219,14 +219,95 @@
     if ((!text && !images.length) || text.length > MAX_TEXT_CHARS) throw new Error("DOCX文本为空或超限，需人工复核。");
     return { ok: true, text, images, imageOrder: "正文标记对应原图顺序；不等于Word页面渲染。" };
   }
-  async function extractMaterial(attachment, download, { vision = false } = {}) {
-    if (attachment.kind !== "image" && attachment.kind !== "pdf" && attachment.kind !== "word") return extract(attachment, download);
+  function archiveEntries(buffer) {
+    const bytes = new Uint8Array(buffer), view = new DataView(buffer);
+    let end = -1;
+    for (let p=bytes.length-22;p>=Math.max(0,bytes.length-65557);p--) if(view.getUint32(p,true)===0x06054b50&&p+22+view.getUint16(p+20,true)===bytes.length){end=p;break;}
+    if(end<0||view.getUint16(end+4,true)||view.getUint16(end+6,true))throw Error("ZIP目录缺失或为分卷文件。");
+    const count=view.getUint16(end+10,true),start=view.getUint32(end+16,true),size=view.getUint32(end+12,true);
+    if(count>500||count!==view.getUint16(end+8,true)||start+size!==end)throw Error("ZIP目录异常或文件数超过500。");
+    let p=start,total=0;const result=[],names=new Set();
+    for(let i=0;i<count;i++){
+      if(p+46>end||view.getUint32(p,true)!==0x02014b50)throw Error("ZIP目录不完整。");
+      const len=view.getUint16(p+28,true),extra=view.getUint16(p+30,true),comment=view.getUint16(p+32,true),expanded=view.getUint32(p+24,true),flags=view.getUint16(p+8,true),attrs=view.getUint32(p+38,true);
+      if(p+46+len+extra+comment>end)throw Error("ZIP目录边界异常。");
+      const name=new TextDecoder().decode(bytes.subarray(p+46,p+46+len)),normalized=name.replaceAll('\\','/').normalize('NFC');
+      if(!name||/[\u0000-\u001f]/.test(name)||/^(?:\/|[A-Za-z]:)/.test(normalized)||normalized.split('/').includes('..')||names.has(normalized)||((attrs>>>16)&0xf000)===0xa000)throw Error("ZIP路径、重复文件或符号链接不安全。");
+      names.add(normalized);total+=expanded;
+      if(flags&1||expanded>20000000||total>50000000)throw Error("ZIP加密或展开内容超限，未截断评分。");
+      if(!normalized.endsWith('/'))result.push({name,normalized,expanded});
+      p+=46+len+extra+comment;
+    }
+    if(p!==end)throw Error("ZIP目录长度不一致。");
+    return result;
+  }
+  async function extractSpreadsheetMaterial(bytes) {
+    const entries=archiveEntries(bytes.buffer);
+    if(entries.some(e=>/^xl\/(?:media|drawings|charts|embeddings|externalLinks)\//.test(e.normalized)||/vbaProject/i.test(e.normalized)))throw Error("XLSX含图片、图表、嵌入或外部连接，需人工核对完整材料。");
+    const xml=async name=>{const b=await readZipEntry(bytes.buffer,name);if(!b)return '';const s=new TextDecoder('utf-8',{fatal:true}).decode(b);if(/<!DOCTYPE|<!ENTITY/i.test(s))throw Error('XLSX XML声明不安全');return s;};
+    const attr=(s,n)=>decodeXmlEntities((s.match(new RegExp('(?:^|\\s)'+n+'\\s*=\\s*["\\\']([^"\\\']*)["\\\']'))||[])[1]||'');
+    const values=s=>[...s.matchAll(/<(?:\w+:)?t\b[^>]*>([\s\S]*?)<\/(?:\w+:)?t>/g)].map(m=>decodeXmlEntities(m[1])).join('');
+    const workbook=await xml('xl/workbook.xml'),relationships=await xml('xl/_rels/workbook.xml.rels');
+    if(!workbook||!relationships)throw Error('XLSX工作簿及工作表关系未获取');
+    const shared=[...(await xml('xl/sharedStrings.xml')).matchAll(/<(?:\w+:)?si\b[^>]*>([\s\S]*?)<\/(?:\w+:)?si>/g)].map(m=>values(m[1]));
+    const relations=new Map([...relationships.matchAll(/<Relationship\b([^>]*?)\/?\s*>/g)].map(m=>[attr(m[1],'Id'),{target:attr(m[1],'Target'),external:attr(m[1],'TargetMode')==='External',type:attr(m[1],'Type')}]));
+    const sheets=[];let cells=0;
+    for(const sheet of workbook.matchAll(/<(?:\w+:)?sheet\b([^>]*?)\/?\s*>/g)){
+      const attributes=sheet[1],r=relations.get(attr(attributes,'r:id'));if(!r||r.external||!/\/worksheet$/.test(r.type))throw Error('XLSX工作表关系不完整');
+      const target=r.target.replace(/^\/xl\//,'');if(!/^worksheets\/[^/]+\.xml$/.test(target))throw Error('XLSX工作表路径不安全');
+      const body=await xml('xl/'+target);if(!body||/<(?:\w+:)?(?:drawing|legacyDrawing|oleObjects)\b/.test(body))throw Error('XLSX工作表未完整读取');
+      const lines=[];
+      for(const row of body.matchAll(/<(?:\w+:)?row\b([^>]*)>([\s\S]*?)<\/(?:\w+:)?row>/g)){
+        const line=[];
+        for(const cell of row[2].matchAll(/<(?:\w+:)?c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/(?:\w+:)?c>)/g)){
+          if(++cells>10000)throw Error('XLSX单元格超限，未截断评分');
+          const address=attr(cell[1],'r'),type=attr(cell[1],'t'),content=cell[2]||'',v=(content.match(/<(?:\w+:)?v\b[^>]*>([\s\S]*?)<\/(?:\w+:)?v>/)||[])[1],f=(content.match(/<(?:\w+:)?f\b[^>]*>([\s\S]*?)<\/(?:\w+:)?f>/)||[])[1];
+          if(!/^[A-Z]{1,3}[1-9]\d*$/.test(address))throw Error('XLSX单元格地址缺失');
+          let value=type==='inlineStr'?values(content):decodeXmlEntities(v||'');
+          if(type==='s'){const index=Number(v);if(v===undefined||!Number.isInteger(index)||index<0||index>=shared.length)throw Error('XLSX共享文本索引未获取');value=shared[index];}
+          if(f!==undefined){if(v===undefined)throw Error('XLSX公式没有缓存值，不能假定计算结果');value+=' [公式缓存，未重算：'+decodeXmlEntities(f)+']';}
+          if(value)line.push(address+'='+value);
+        }
+        if(line.length)lines.push(line.join(' | '));
+      }
+      const merges=[...body.matchAll(/<(?:\w+:)?mergeCell\b([^>]*?)\/?\s*>/g)].map(m=>attr(m[1],'ref'));
+      sheets.push({name:attr(attributes,'name'),state:attr(attributes,'state')||'visible',rows:lines,mergedRanges:merges});
+    }
+    if(!sheets.length||!sheets.some(s=>s.rows.length))throw Error('XLSX工作表或作答内容未获取');
+    const text=sheets.map((s,n)=>`工作表${n+1}：${s.name}（${s.state}）\n${s.mergedRanges.length?'合并区域：'+s.mergedRanges.join(',')+'\n':''}${s.rows.join('\n')}`).join('\n\n');
+    if(text.length>MAX_TEXT_CHARS)throw Error('XLSX文字超限，未截断评分');
+    return {ok:true,text,images:[],sheetCount:sheets.length,execution:'仅静态读取所有工作表，未重算公式、未访问外部链接'};
+  }
+  async function extractArchiveMaterial(bytes, vision, archiveDepth) {
+    if(archiveDepth>=2)throw Error("ZIP嵌套超过两层，需人工复核。");
+    const entries=archiveEntries(bytes.buffer),files=[];let totalText=0,totalImages=0;
+    for(const entry of entries){
+      const name=entry.normalized;
+      if(name.startsWith('__MACOSX/')||/(?:^|\/)(?:\.DS_Store|Thumbs\.db)$/.test(name))continue;
+      const data=await readZipEntry(bytes.buffer,entry.name);
+      if(!data)throw Error("ZIP文件项未完整读取。");
+      let kind;
+      if(/\.zip$/i.test(name))kind='archive';else if(/\.xlsx$/i.test(name))kind='spreadsheet';else if(/\.docx$/i.test(name))kind='word';else if(/\.pdf$/i.test(name))kind='pdf';else if(/\.(png|jpe?g|webp)$/i.test(name))kind='image';else if(/\.(txt|md|markdown|csv|json|xml|log|yml|yaml|ini|tex|py|js|ts|jsx|tsx|html|css|vue|sql|java|c|cpp|h|sh|bat|ps1|ipynb)$/i.test(name)||/(?:^|\/)(?:LICENSE|Dockerfile|Makefile|\.gitignore)$/i.test(name))kind='text';else throw Error("ZIP含未支持文件类型，不能忽略后评分。");
+      let encoded='';for(let p=0;p<data.length;p+=32768)encoded+=String.fromCharCode(...data.subarray(p,p+32768));
+      const item=await extractMaterial({kind,fileName:name},async()=>({ok:true,dataBase64:btoa(encoded)}),{vision,archiveDepth:archiveDepth+1});
+      if(!item.ok)throw Error(item.reason||"ZIP文件项读取失败。");
+      totalText+=(item.text||'').length;totalImages+=(item.images||[]).reduce((n,s)=>n+s.length,0);
+      if(totalText>48000||totalImages>18000000)throw Error("ZIP材料超限，未截断评分。");
+      files.push({fileName:name,kind,...item});
+    }
+    if(!files.length)throw Error("ZIP没有可核验的作答文件。");
+    return {ok:true,text:files.map(f=>`文件：${f.fileName}\n${f.text||''}`).join('\n\n'),images:files.flatMap(f=>f.images||[]),files,archiveComplete:true,execution:'仅静态读取，未执行任何文件'};
+  }
+  async function extractMaterial(attachment, download, { vision = false, archiveDepth = 0 } = {}) {
+    if (!["image","pdf","word","archive","spreadsheet"].includes(attachment.kind)) return extract(attachment, download);
     const result = await download(attachment);
     if (!result?.ok) return { ok: false, reason: result?.reason || "附件未获取。" };
     let bytes;
     try { bytes = base64ToBytes(result.dataBase64); } catch { return { ok: false, reason: "附件数据解码失败。" }; }
     if (bytes.length > 15000000) return { ok: false, reason: "附件超过15MB，请拆分或人工复核。" };
     try {
+      if (attachment.kind === "archive") return { ...await extractArchiveMaterial(bytes, vision, archiveDepth), contentKey: globalThis.LearningTongBatch.digest(result.dataBase64) };
+      if (attachment.kind === "spreadsheet") return { ...await extractSpreadsheetMaterial(bytes), contentKey: globalThis.LearningTongBatch.digest(result.dataBase64) };
       if (attachment.kind === "image") {
         if (!vision) return { ok: false, reason: "模型尚未通过图像能力测试，图片转人工复核。" };
         const mime = imageMime(bytes);
@@ -264,5 +345,5 @@
       } finally { await pdf.destroy(); }
     } catch (e) { return { ok: false, reason: `附件无法完整读取：${String(e.message || e).slice(0, 160)}` }; }
   }
-  globalThis.LearningTongAttachmentExtract = Object.freeze({ extract, extractMaterial, extractDocxMaterial, imageMime, validateRaster, crc32, extractDocxText, docxXmlToText, readZipEntry, decodeXmlEntities, base64ToBytes });
+  globalThis.LearningTongAttachmentExtract = Object.freeze({ extract, extractMaterial, extractSpreadsheetMaterial, extractArchiveMaterial, archiveEntries, extractDocxMaterial, imageMime, validateRaster, crc32, extractDocxText, docxXmlToText, readZipEntry, decodeXmlEntities, base64ToBytes });
 })();
