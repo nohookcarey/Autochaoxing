@@ -211,3 +211,47 @@ test("malformed UTF-8 text is unreadable instead of a replacement-character answ
 test("unsupported binary attachment cannot be treated as UTF-8 text",async()=>{
  let called=false;const r=await createExtractContext().extractMaterial({kind:'other',fileName:'answer.zip'},async()=>{called=true;return {ok:true,dataBase64:Buffer.from('binary masquerading as an answer').toString('base64')};});assert.equal(r.ok,false);assert.equal(called,false);
 });
+
+const archiveDownload = bytes => async()=>({ok:true,dataBase64:Buffer.from(bytes).toString('base64')});
+test('ZIP reads every supported file and nested document without executing code',async()=>{
+ const api=createExtractContext(),enc=new TextEncoder();
+ const docx=buildZip([{name:'word/document.xml',data:enc.encode(SAMPLE_XML)}]);
+ const zip=buildZip([{name:'资料/说明.md',data:enc.encode('完整岗位条件')},{name:'资料/答卷.docx',data:docx},{name:'app.js',data:enc.encode('throw new Error("must never run");')}]);
+ const r=await api.extractMaterial({kind:'archive',fileName:'answer.zip'},archiveDownload(zip));
+ assert.equal(r.ok,true,r.reason);assert.equal(r.files.length,3);assert.equal(r.archiveComplete,true);assert.match(r.text,/完整岗位条件/);assert.match(r.text,/第一段&内容/);assert.match(r.text,/must never run/);assert.match(r.execution,/未执行/);
+});
+test('ZIP refuses traversal, normalized duplicate names and unsupported binaries',async()=>{
+ const api=createExtractContext(),data=new TextEncoder().encode('answer');
+ for(const names of [['../answer.md'],['C:/answer.md'],['a/answer.md','a\\answer.md'],['answer.exe']]){
+  const r=await api.extractMaterial({kind:'archive',fileName:'answer.zip'},archiveDownload(buildZip(names.map(name=>({name,data})))));assert.equal(r.ok,false);assert.match(r.reason,/路径|文件类型/);
+ }
+});
+test('ZIP rejects damaged file bytes, excessive nesting and oversized text without partial success',async()=>{
+ const api=createExtractContext(),data=new TextEncoder().encode('answer');
+ const broken=buildZip([{name:'a.txt',data}]);broken[35]^=1;
+ let r=await api.extractMaterial({kind:'archive',fileName:'answer.zip'},archiveDownload(broken));assert.equal(r.ok,false);assert.match(r.reason,/校验/);
+ const a=buildZip([{name:'a.txt',data}]),b=buildZip([{name:'b.zip',data:a}]),c=buildZip([{name:'c.zip',data:b}]);
+ r=await api.extractMaterial({kind:'archive',fileName:'answer.zip'},archiveDownload(c));assert.equal(r.ok,false);assert.match(r.reason,/嵌套/);
+ r=await api.extractMaterial({kind:'archive',fileName:'answer.zip'},archiveDownload(buildZip([{name:'a.txt',data:new TextEncoder().encode('x'.repeat(16001))}])));assert.equal(r.ok,false);assert.match(r.reason,/超过|超限/);
+});
+test('ZIP does not reinterpret image bytes as text when image reading is unavailable',async()=>{
+ const api=createExtractContext();const r=await api.extractMaterial({kind:'archive',fileName:'answer.zip'},archiveDownload(buildZip([{name:'screenshot.png',data:new Uint8Array([1,2,3])}])));
+ assert.equal(r.ok,false);assert.match(r.reason,/图像能力/);
+});
+
+function spreadsheetFixture({sheet='<row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1" t="inlineStr"><is><t>城市</t></is></c></row>',extra=[]}={}){
+ const enc=new TextEncoder(),rows=[['xl/workbook.xml','<workbook><sheets><sheet name="条件表" r:id="rId1" state="hidden"/></sheets></workbook>'],['xl/_rels/workbook.xml.rels','<Relationships><Relationship Id="rId1" Target="worksheets/sheet1.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"/></Relationships>'],['xl/sharedStrings.xml','<sst><si><t>岗位名称</t></si></sst>'],['xl/worksheets/sheet1.xml','<worksheet><sheetData>'+sheet+'</sheetData><mergeCells><mergeCell ref="A2:B2"/></mergeCells></worksheet>'],...extra];
+ return buildZip(rows.map(([name,data])=>({name,data:enc.encode(data)})));
+}
+test('XLSX preserves cell addresses, hidden sheets, shared strings and merged ranges read only',async()=>{
+ const r=await createExtractContext().extractMaterial({kind:'spreadsheet',fileName:'answer.xlsx'},archiveDownload(spreadsheetFixture()));
+ assert.equal(r.ok,true,r.reason);assert.equal(r.sheetCount,1);assert.match(r.text,/条件表（hidden）/);assert.match(r.text,/A1=岗位名称 \| B1=城市/);assert.match(r.text,/A2:B2/);assert.match(r.execution,/未重算/);
+});
+test('XLSX formulas require cached results and never execute, missing shared strings fail closed',async()=>{
+ const api=createExtractContext();
+ for(const sheet of ['<row><c r="A1"><f>1+1</f></c></row>','<row><c r="A1" t="s"><v>88</v></c></row>']){const r=await api.extractMaterial({kind:'spreadsheet',fileName:'answer.xlsx'},archiveDownload(spreadsheetFixture({sheet})));assert.equal(r.ok,false);assert.match(r.reason,/缓存|索引/);}
+ const r=await api.extractMaterial({kind:'spreadsheet',fileName:'answer.xlsx'},archiveDownload(spreadsheetFixture({sheet:'<row><c r="A1"><f>1+1</f><v>2</v></c></row>'})));assert.equal(r.ok,true,r.reason);assert.match(r.text,/A1=2 \[公式缓存，未重算：1\+1\]/);
+});
+test('XLSX drawings and external-link parts block incomplete text-only grading',async()=>{
+ for(const name of ['xl/media/image1.png','xl/externalLinks/externalLink1.xml','xl/charts/chart1.xml']){const r=await createExtractContext().extractMaterial({kind:'spreadsheet',fileName:'answer.xlsx'},archiveDownload(spreadsheetFixture({extra:[[name,'unread material']]})));assert.equal(r.ok,false);assert.match(r.reason,/图片|图表|外部/);}
+});

@@ -23,6 +23,27 @@ test('new page outer TiMu enumerates each question, not one wrapper',()=>{
 test('hidden reference display does not erase student answer or mix labels',()=>{
  const r=A.readSnapshot(fixture({questions:1}),url,identity);assert.equal(r.questions[0].studentAnswer,'正文0');assert.equal(r.questions[0].referenceAnswer,'参考');
 });
+function hyperlinkFixture({label='具体书籍详情',href='https://books.example.test/catalogue/book_1/index.html',download=false,role='学生答案'}={}){
+ const doc=fixture({questions:1,empty:true}),box=doc.querySelectorAll('.mark_item, .mark_item1')[0],answer=box.querySelector('.mark_answer_key');
+ const anchor={textContent:label,getAttribute:k=>k==='href'?href:k==='download'&&download?'':null,hasAttribute:k=>k==='download'&&download,closest:()=>null};
+ box.querySelectorAll=s=>s==='a[href]'?[anchor]:[];
+ doc.createRange=()=>({selectNodeContents(){},setEndBefore(){},toString:()=>role+'：'});
+ return doc;
+}
+test('ordinary student HTML web links remain exact bound answer evidence without attachment fetch',()=>{
+ for(const label of ['具体书籍详情','https://books.example.test/catalogue/book_1/index.html']){
+  const s=A.readSnapshot(hyperlinkFixture({label}),url,identity);
+  assert.equal(s.complete,true);assert.equal(s.questions[0].attachments.length,0);
+  assert.ok(s.questions[0].studentAnswer.includes('https://books.example.test/catalogue/book_1/index.html'));
+ }
+});
+test('HTML files, explicit downloads, unknown binaries and reference links are not silently removed',()=>{
+ for(const options of [{label:'日程工具.html'},{download:true},{label:'下载'},{label:'未知材料.rar',href:'https://files.example.test/a.rar'},{role:'正确答案'}]){
+  const s=A.readSnapshot(hyperlinkFixture(options),url,identity);
+  assert.equal(s.questions[0].attachments.length,1);
+  assert.equal(s.questions[0].studentAnswer,'');
+ }
+});
 test('iframe attachment is explicitly unread, cannot masquerade as complete empty answer',()=>{
  const r=A.readSnapshot(fixture({questions:1,embedded:true,empty:true}),url,identity);assert.equal(r.complete,false);assert.match(r.reason,/内嵌附件/);assert.equal(r.questions[0].unresolvedMaterials.length,1);assert.equal(r.questions[0].unresolvedMaterials[0].kind,'word');
 });
@@ -40,6 +61,16 @@ function fetchFixture({objectid='a'.repeat(32),download='http://d0.cldisk.com/do
 }
 test('native DOCX viewer becomes a bound attachment, no viewer text used as answer',()=>{
  const r=A.readSnapshot(nativeFixture(),url,identity);assert.equal(r.complete,true);assert.equal(r.questions[0].studentAnswer,'');assert.equal(r.questions[0].unresolvedMaterials.length,0);assert.equal(r.questions[0].attachments[0].resolver,'chaoxing-status');assert.equal(r.questions[0].attachments[0].role,'学生答案');
+});
+test('native ZIP viewer is bound to the current submission without using viewer text as content',()=>{
+ const doc=nativeFixture(),frame=doc.querySelectorAll('.mark_item, .mark_item1')[0].querySelector('.mark_answer_key').querySelectorAll('iframe')[0];
+ const original=frame.getAttribute;frame.getAttribute=k=>k==='filename'?'匿名答卷.zip':original(k);
+ const snapshot=A.readSnapshot(doc,url,identity);assert.equal(snapshot.complete,true);assert.equal(snapshot.questions[0].attachments[0].kind,'archive');assert.equal(snapshot.questions[0].attachments[0].resolver,'chaoxing-status');assert.equal(snapshot.questions[0].studentAnswer,'');
+});
+test('native XLSX viewer keeps identity binding and is explicitly classified as a spreadsheet',()=>{
+ const doc=nativeFixture(),frame=doc.querySelectorAll('.mark_item, .mark_item1')[0].querySelector('.mark_answer_key').querySelectorAll('iframe')[0];
+ const original=frame.getAttribute;frame.getAttribute=k=>k==='filename'?'匿名表格.xlsx':original(k);
+ const s=A.readSnapshot(doc,url,identity);assert.equal(s.complete,true);assert.equal(s.questions[0].attachments[0].kind,'spreadsheet');assert.equal(s.questions[0].attachments[0].objectId,'a'.repeat(32));
 });
 test('native material resolves verified object, HTTPS CDN with no credentials, exact bytes',async()=>{
  const {fetcher,calls}=fetchFixture();const r=await A.readEmbeddedMaterial(nativeFixture(),url,identity,nativeAttachment(),fetcher);
