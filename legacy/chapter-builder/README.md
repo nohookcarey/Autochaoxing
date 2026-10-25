@@ -23,9 +23,12 @@
 ```bash
 npm install
 cp .env.example .env
+cp data/chapters.example.json data/chapters.json
 ```
 
 ## 运行
+
+先在本机填写 `.env` 和新复制的输入文件；公开仓库仅附带示例。`start` 会真实写入，仍需按旧工具要求审查并显式启用写入；本说明不构成平台写入授权。
 
 ```bash
 npm run start -- --input ./data/chapters.json
