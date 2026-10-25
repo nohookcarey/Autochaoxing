@@ -10,7 +10,7 @@
     "dry-run": "node src/main.js --dry-run"
   },
   "dependencies": {
-    "dotenv": "^16.6.1",
+    "dotenv": "^18.0.8",
     "playwright": "^1.55.1"
   },
   "license": "MIT"
