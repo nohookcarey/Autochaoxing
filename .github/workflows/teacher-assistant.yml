@@ -1,10 +1,8 @@
 name: Teacher assistant checks
 on:
   pull_request:
-    paths: ['apps/teacher-assistant/**', 'scripts/**', 'docs/**', 'legacy/**', '*.md', '.github/dependabot.yml', '.github/workflows/**']
   push:
     branches: [main]
-    paths: ['apps/teacher-assistant/**', 'scripts/**', 'docs/**', 'legacy/**', '*.md', '.github/dependabot.yml', '.github/workflows/**']
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
