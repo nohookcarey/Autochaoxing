@@ -6,14 +6,14 @@
 |---|---|
 | `apps/teacher-assistant/` | 当前教师助手：扩展、网页工作台、本机服务、配置模板和测试 |
 | `legacy/` | 5类旧独立工具，保留原实现与写入限制 |
-| `docs/teacher-assistant/` | 使用、版本和验收证据；CI模板仍未启用 |
+| `docs/teacher-assistant/` | 使用、版本和验收证据；自动检查配置位于.github/workflows |
 | `docs/project/` | 项目与历史决策记录 |
 | `scripts/` | 仓库隐私与结构检查 |
 | `.github/` | 反馈模板、贡献模板和依赖更新配置 |
 
 原 `输出成果/教学运营自动化系统/` 对应当前主程序；其 `docs/` 已集中到文档区。其余旧业务目录分别迁往 `legacy/assignments`、`chapter-tests`、`chapter-builder`、`deadlines`、`attendance`。文件按Git重命名保留，未删除历史代码或许可证。
 
-已有开发者切换到新目录运行 `npm ci`、`npm test`；根目录运行 `node scripts/verify-public-repository.mjs` 与 `node scripts/verify-repository-layout.mjs`；后者同时检查导航链接、Dependabot项目及CI模板路径。安装版教师继续使用现有Release，无需因目录变化重新安装。源码中的 `extension/` 必须以浏览器扩展方式加载。
+已有开发者切换到新目录运行 `npm ci`、`npm test`；根目录运行 `node scripts/verify-public-repository.mjs` 与 `node scripts/verify-repository-layout.mjs`；后者同时检查导航链接、Dependabot项目及正式CI工作流路径。安装版教师继续使用现有Release，无需因目录变化重新安装。源码中的 `extension/` 必须以浏览器扩展方式加载。
 
 【知识库对齐核验】
 

@@ -6,4 +6,4 @@
 - 安全：[安全与公开发布审查](安全与发布审查_v0.41.4.md)、[历史清理记录](历史清理待确认方案.md)
 - 历史：[旧工具索引](../legacy/README.md)、[版本沿革](project/版本沿革.md)、[项目目标](project/项目目标.md)、[决策记录](project/决策记录.md)
 
-`teacher-assistant/` 内保留按版本记录的说明、验收和证据，历史数字以对应日期为准。`teacher-assistant/ci/` 是尚未启用的工作流模板，不代表远端CI已通过。
+`teacher-assistant/` 内保留按版本记录的说明、验收和证据，历史数字以对应日期为准。自动检查配置维护在[GitHub Actions工作流](../.github/workflows/teacher-assistant.yml)，触发条件和结果见[CI说明](ci.md)。历史报告中“尚未启用CI”的描述为当时状态。

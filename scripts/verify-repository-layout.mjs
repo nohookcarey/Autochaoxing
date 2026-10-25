@@ -21,10 +21,10 @@ export async function verifyRepositoryLayout(directory){
    linksChecked++;if(!await exists(relative(root,absolute)))issues.push({path,target,rule:'broken-link'});
   }
  }}await walk(root);
- for(const config of ['.github/dependabot.yml','docs/teacher-assistant/ci/teacher-assistant.yml']){
+ for(const config of ['.github/dependabot.yml','.github/workflows/teacher-assistant.yml']){
   if(!await exists(config)){issues.push({path:config,rule:'missing-automation-config'});continue;}
   const text=await readFile(join(root,config),'utf8');
-  if(config.startsWith('.github/')){
+  if(config==='.github/dependabot.yml'){
    const directories=[...text.matchAll(/^\s*(?:-\s*)?directory:\s*["']?([^"'\n]+?)["']?\s*$/gm)].map(m=>m[1].trim()).sort();
    if(JSON.stringify(directories)!==JSON.stringify(['/apps/teacher-assistant','/legacy/chapter-builder','/legacy/chapter-tests']))issues.push({path:config,rule:'dependency-projects-mismatch'});
   }

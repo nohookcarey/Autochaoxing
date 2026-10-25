@@ -1,11 +1,12 @@
 name: Teacher assistant checks
 on:
   pull_request:
-    paths: ['apps/teacher-assistant/**', 'scripts/**', 'docs/**', 'legacy/**', '*.md', '.github/dependabot.yml', '.github/workflows/teacher-assistant.yml']
   push:
     branches: [main]
-    paths: ['apps/teacher-assistant/**', 'scripts/**', 'docs/**', 'legacy/**', '*.md', '.github/dependabot.yml', '.github/workflows/teacher-assistant.yml']
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -19,14 +20,13 @@ jobs:
     timeout-minutes: 15
     defaults:
       run:
+        shell: bash
         working-directory: apps/teacher-assistant
-    env:
-      EXTENSION_RELEASE_DIR: ${{ runner.temp }}/teacher-assistant-extension
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22'
           cache: npm
@@ -35,12 +35,16 @@ jobs:
       - name: Repository paths and publication boundaries
         working-directory: .
         run: |
-          node --test scripts/*.test.mjs
+          node --test scripts/public-repository.test.mjs scripts/repository-layout.test.mjs
           node scripts/verify-public-repository.mjs
           node scripts/verify-repository-layout.mjs
       - run: npm ci --registry=https://registry.npmjs.org
       - run: npm test
       - run: npm run verify:publication
       - run: npm audit --registry=https://registry.npmjs.org --audit-level=low
-      - run: node scripts/build-extension-release.mjs
-      - run: npm run verify:release
+      - name: Build and verify extension package
+        env:
+          EXTENSION_RELEASE_DIR: ${{ runner.temp }}/teacher-assistant-extension
+        run: |
+          node scripts/build-extension-release.mjs
+          npm run verify:release
