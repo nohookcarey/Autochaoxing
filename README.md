@@ -68,6 +68,10 @@ v0.41.4 增加网关来源/会话校验、附件流式限额、全仓隐私门�
 
 当前主程序位于 `apps/teacher-assistant/`；5类旧工具集中在 `legacy/`，文档与验收记录位于 `docs/`。详见[文档导航](docs/README.md)与[目录迁移说明](docs/repository-layout.md)。
 
+## 自动检查
+
+GitHub Actions 配置覆盖Linux、Windows和macOS，自动执行测试、构建、隐私与路径检查及扩展打包核验。[运行记录](https://github.com/nohookcarey/Autochaoxing/actions/workflows/teacher-assistant.yml)显示每次真实结果；[CI说明](docs/ci.md)列明范围。自动检查不代替真实学习通或跨校现场验收。
+
 ## 给开发者
 
 主程序在[apps/teacher-assistant](apps/teacher-assistant/)。Node.js 22+，在该目录运行 npm ci、npm test；根目录运行 node scripts/verify-public-repository.mjs 检查公开树。[贡献指南](CONTRIBUTING.md) 包含验证和发布要求。

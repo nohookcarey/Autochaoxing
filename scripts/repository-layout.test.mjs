@@ -10,7 +10,7 @@ async function fixture(){
  const root=await mkdtemp(join(tmpdir(),'repository-layout-'));
  const files={'README.md':'[安装](INSTALL.md)','INSTALL.md':'Install','docs/README.md':'Docs','legacy/README.md':'Legacy',
  '.github/dependabot.yml':'version: 2\nupdates:\n  - directory: "/apps/teacher-assistant"\n  - directory: "/legacy/chapter-builder"\n  - directory: "/legacy/chapter-tests"\n',
- 'docs/teacher-assistant/ci/teacher-assistant.yml':'working-directory: apps/teacher-assistant\ncache-dependency-path: apps/teacher-assistant/package-lock.json\n',
+ '.github/workflows/teacher-assistant.yml':'working-directory: apps/teacher-assistant\ncache-dependency-path: apps/teacher-assistant/package-lock.json\n',
  'apps/teacher-assistant/extension/manifest.json':'{}','apps/teacher-assistant/config/vendor-integrity.json':'{"files":[]}',
  'apps/teacher-assistant/extension/chapter-test-profiles.local.js':'globalThis.LearningTongChapterTestProfiles = [];\n',
  'apps/teacher-assistant/extension/attendance-profiles.local.js':'globalThis.LearningTongAttendanceProfiles = [];\n'};

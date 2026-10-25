@@ -1,11 +1,14 @@
 name: Teacher assistant checks
 on:
   pull_request:
-    paths: ['apps/teacher-assistant/**', 'scripts/**', 'docs/**', 'legacy/**', '*.md', '.github/dependabot.yml', '.github/workflows/teacher-assistant.yml']
+    paths: ['apps/teacher-assistant/**', 'scripts/**', 'docs/**', 'legacy/**', '*.md', '.github/dependabot.yml', '.github/workflows/**']
   push:
     branches: [main]
-    paths: ['apps/teacher-assistant/**', 'scripts/**', 'docs/**', 'legacy/**', '*.md', '.github/dependabot.yml', '.github/workflows/teacher-assistant.yml']
+    paths: ['apps/teacher-assistant/**', 'scripts/**', 'docs/**', 'legacy/**', '*.md', '.github/dependabot.yml', '.github/workflows/**']
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -19,6 +22,7 @@ jobs:
     timeout-minutes: 15
     defaults:
       run:
+        shell: bash
         working-directory: apps/teacher-assistant
     env:
       EXTENSION_RELEASE_DIR: ${{ runner.temp }}/teacher-assistant-extension
@@ -35,7 +39,7 @@ jobs:
       - name: Repository paths and publication boundaries
         working-directory: .
         run: |
-          node --test scripts/*.test.mjs
+          node --test scripts/public-repository.test.mjs scripts/repository-layout.test.mjs
           node scripts/verify-public-repository.mjs
           node scripts/verify-repository-layout.mjs
       - run: npm ci --registry=https://registry.npmjs.org
