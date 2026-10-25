@@ -1,3 +1,4 @@
+throw new Error("历史定向写入脚本已停用。请使用教师扩展重新扫描、确认评分卡并审核提交。");
 const { chromium } = require('playwright');
 const {
   closeBrowserQuietly,
@@ -24,7 +25,7 @@ async function main() {
     await browserGuard.run(async () => {
       const page = await browser.newPage();
       await login(page);
-      await page.goto('https://mooc2-ans.chaoxing.com/mooc2-ans/work/library/review-work?courseid=0&clazzid=0&workId=0&workAnswerId=0&groupId=0&from=&sort=0&order=0&status=0&pages=1&size=20&topicid=0', { waitUntil: 'networkidle' });
+      await page.goto('https://mooc2-ans.chaoxing.com/mooc2-ans/work/library/review-work?courseid=&clazzid=&workId=&workAnswerId=&groupId=0&from=&sort=0&order=0&status=0&pages=1&size=20&topicid=0', { waitUntil: 'networkidle' });
       await page.evaluate(() => {
         const inputs = Array.from(document.querySelectorAll('input[type="text"]'));
         const visible = inputs.filter((el) => {

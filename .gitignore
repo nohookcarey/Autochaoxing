@@ -161,3 +161,11 @@ blob-report/
 *.bak
 工作区/
 **/deadline_update_config.json
+
+# Private connections and accidental local copies (tracked empty profiles remain checked)
+**/*.local.json
+**/* 2.*
+**/*.git.bundle
+**/*.pem
+**/*.key
+**/storage/

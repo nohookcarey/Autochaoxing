@@ -60,7 +60,8 @@ test("ai-attachment-download fetches bytes and returns base64", async () => {
   const harness = createHarness(async (url, options) => {
     assert.equal(url, "https://files.chaoxing.com/a.pdf");
     assert.equal(options.credentials, "include");
-    return { ok: true, status: 200, arrayBuffer: async () => payload.buffer };
+    assert.equal(options.redirect, "error");
+    return new Response(payload);
   });
   const response = await harness.api.sendRuntimeMessage({
     type: "ai-attachment-download",
@@ -78,6 +79,19 @@ test("ai-attachment-download reports http failures", async () => {
   });
   assert.equal(response.ok, false);
   assert.match(response.reason, /HTTP 404/);
+});
+
+test("single-answer attachments refuse an oversized declared body before buffering", async () => {
+  let buffered = false;
+  const harness = createHarness(async () => {
+    const response = new Response("small body", { headers: { "content-length": "15000001" } });
+    response.arrayBuffer = async () => { buffered = true; return new ArrayBuffer(1); };
+    return response;
+  });
+  const response = await harness.api.sendRuntimeMessage({ type: "ai-attachment-download", attachment: { href: "https://files.chaoxing.com/a.pdf" } });
+  assert.equal(response.ok, false);
+  assert.match(response.reason, /15MB/);
+  assert.equal(buffered, false);
 });
 
 test("ai-attachment-download rejects invalid links", async () => {

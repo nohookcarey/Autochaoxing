@@ -8,21 +8,18 @@ const {
 const ENV = process.env || {};
 
 const LOGIN_URL = 'https://passport2.chaoxing.com/login?fid=12&refer=http%3A%2F%2Fi.chaoxing.com%2Fbase%3Fvflag%3Dtrue%26fid%3D%26backUrl%3D&space=2';
-const COURSE_ID = '0';
-const CPI = '0';
-const PRIMARY_CLASS_ID = '141397001';
+const COURSE_ID = ENV.XTX_COURSE_ID || '';
+const CPI = ENV.XTX_CPI || '';
+const PRIMARY_CLASS_ID = ENV.XTX_PRIMARY_CLASS_ID || '';
 const USERNAME = ENV.XTX_USERNAME || '';
 const PASSWORD = ENV.XTX_PASSWORD || '';
 const BASE_ORIGIN = 'https://mooc2-ans.chaoxing.com';
 const DISCOVERY_MAX_MAJOR_CHAPTER = 9;
-const TARGET_CLASSES = [
-  { label: '人工智能3班', id: '141396990' },
-  { label: '人工智能4班', id: '141396996' },
-  { label: '人工智能6班', id: '141397008' },
-];
+const TARGET_CLASSES = JSON.parse(ENV.XTX_TARGET_CLASSES_JSON || '[]');
 const TIMEOUTS = getTimeoutConfig();
 
 async function login(page) {
+  if (!/^\d+$/.test(COURSE_ID) || !/^\d+$/.test(CPI) || !/^\d+$/.test(PRIMARY_CLASS_ID) || !Array.isArray(TARGET_CLASSES) || !TARGET_CLASSES.length || TARGET_CLASSES.some(c => !c.label || !/^\d+$/.test(c.id || ""))) throw new Error("未配置本次课程与班级范围；不会登录或采集。推荐使用教师扩展。");
   if (!USERNAME || !PASSWORD) {
     throw new Error('请通过 XTX_USERNAME 和 XTX_PASSWORD 环境变量提供学习通账号信息。');
   }

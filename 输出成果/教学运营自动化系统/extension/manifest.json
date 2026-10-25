@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "教学运营助手（本机）",
-  "version": "0.41.3",
+  "version": "0.41.4",
   "description": "教师批改辅助：待批核验、评分卡、图像AI建议、集中审核、教师确认提交与独立回读。",
   "permissions": [
     "activeTab",

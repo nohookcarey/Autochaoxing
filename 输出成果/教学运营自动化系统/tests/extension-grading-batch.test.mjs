@@ -86,10 +86,10 @@ test("cancelled request does not retry or accept a late response", async () => {
   assert.equal(calls, 1);
 });
 
-function transport({ delayedVerification = false, verificationError = false } = {}) {
+function transport({ delayedVerification = false, verificationError = false, fetcher = fetch } = {}) {
   const data = {}, pages = [], counters = { submit: 0, verifyScores: [], updates: [], removed: [], created: [] }; let listener;
   const store = { async get(keys) { return Object.fromEntries((Array.isArray(keys) ? keys : [keys]).map(k => [k, structuredClone(data[k])])); }, async set(entries) { Object.assign(data, structuredClone(entries)); }, async remove(keys) { for (const k of Array.isArray(keys) ? keys : [keys]) delete data[k]; } };
-  const c = { ...context, loadAiConfig: async () => ({}), hasAiOriginPermission: async () => true };
+  const c = { ...context, fetch: fetcher, bytesToBase64: bytes => Buffer.from(bytes).toString("base64"), loadAiConfig: async () => ({}), hasAiOriginPermission: async () => true };
   c.globalThis = c;
   c.chrome = { runtime: { id: "test-extension", getURL: p => `chrome-extension://test-extension/${p}`, lastError: null, onMessage: { addListener: fn => { listener = fn; } } }, storage: { session: store }, tabs: {
     create(options, cb) { counters.created.push(options); cb({ id: 3 }); }, remove(id, cb) { counters.removed.push(id); cb(); },
@@ -103,6 +103,7 @@ function transport({ delayedVerification = false, verificationError = false } = 
     },
   } };
   vm.runInNewContext(readFileSync(new URL("../extension/content/grading-adapter-core.js", import.meta.url), "utf8"), c);
+  vm.runInNewContext(readFileSync(new URL("../extension/background-utils.js", import.meta.url), "utf8"), c);
   vm.runInNewContext(readFileSync(new URL("../extension/grading-batch-background.js", import.meta.url), "utf8"), c);
   const sender = { id: "test-extension", url: "chrome-extension://test-extension/workspace/workspace.html", tab: { id: 1 } };
   return { data, counters, async seed(batch) { await store.set({ [`gradingBatch:${batch.id}`]: batch }); }, async send(message, from = sender) { const r = await new Promise(resolve => listener(message, from, resolve)); await new Promise(resolve => setImmediate(resolve)); return r; } };
@@ -208,3 +209,15 @@ test('independent readback uses the dispatched score after rubric changes and wo
   const prepared=await t.send({type:"batch-prepare-submit",id:batch.id,key:item.key});await t.send({type:"batch-submit",id:batch.id,token:prepared.token});
   const result=await t.send({type:"batch-verify",id:batch.id,key:item.key});assert.equal(result.ok,false);assert.equal(t.counters.submit,1);assert.deepEqual(t.counters.removed,[3]);assert.equal(t.data["gradingBatch:"+batch.id].items[0].state,B.states.uncertain);
  });
+
+test("batch direct attachment accepts bounded bytes and cancels a false-length stream", async () => {
+  let cancelled = false, reads = 0;
+  const small = transport({ fetcher: async () => new Response("fixture") });
+  const ok = await small.send({ type: "batch-attachment", href: "https://files.chaoxing.com/a.txt" });
+  assert.equal(ok.ok, true, ok.reason); assert.equal(Buffer.from(ok.dataBase64, "base64").toString(), "fixture");
+  const large = transport({ fetcher: async () => new Response(new ReadableStream({
+    pull(stream) { reads++; stream.enqueue(new Uint8Array(1000000)); }, cancel() { cancelled = true; },
+  }, { highWaterMark: 0 }), { headers: { "content-length": "1" } }) });
+  const denied = await large.send({ type: "batch-attachment", href: "https://files.chaoxing.com/a.txt" });
+  assert.equal(denied.ok, false); assert.match(denied.reason, /15MB/); assert.equal(cancelled, true); assert.equal(reads, 16);
+});

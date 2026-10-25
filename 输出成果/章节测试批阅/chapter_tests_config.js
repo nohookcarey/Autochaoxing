@@ -1,30 +1,3 @@
-const KNOWN_CHAPTER_TESTS = [
-  { num: '2.1', title: '2.1 任务一：在线语料库的获取', taskCount: '3', taskNum: 4, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '2.2', title: '2.2 任务二：网络在线语料分析', taskCount: '2', taskNum: 3, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '2.3', title: '2.3 任务三：构建电影评论语料库', taskCount: '2', taskNum: 3, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '3.1', title: '3.1 任务一：正则表达式函数', taskCount: '3', taskNum: 4, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '3.2', title: '3.2 任务二：正则表达式元字符', taskCount: '3', taskNum: 4, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '3.3', title: '3.3 任务三：正则表达式应用', taskCount: '1', taskNum: 4, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '4.1', title: '4.1 任务一：基于规则分词的应用实例', taskCount: '3', taskNum: 4, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '4.2', title: '4.2 任务二：基于统计分词的应用实例', taskCount: '3', taskNum: 3, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '4.3', title: '4.3 任务三：基于深度学习分词的应用实例', taskCount: '3', taskNum: 3, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '5.1', title: '5.1 任务一：基于 HMM 的词性标注', taskCount: '2', taskNum: 2, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '5.2', title: '5.2 任务二：基于深度学习的词性标注', taskCount: '2', taskNum: 2, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '5.3', title: '5.3 任务三：基于 CRF 模型的中文命名实体识别', taskCount: '2', taskNum: 2, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '5.4', title: '5.4 任务四：基于深度学习的中文命名实体识别', taskCount: '3', taskNum: 2, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '5.5', title: '5.5 任务五：基于 sklearn-cfrsuite 库中文命名实体识别', taskCount: '2', taskNum: 2, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '6.1', title: '6.1 任务一：基于统计的关键词提取', taskCount: '3', taskNum: 4, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '6.2', title: '6.2 任务二：基于语义的关键词提取', taskCount: '2', taskNum: 3, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '7.1', title: '7.1 任务一：文本向量化的离散化表示', taskCount: '3', taskNum: 3, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '7.2', title: '7.2 任务二：文本向量化的分布式表示 Word2Vec', taskCount: '2', taskNum: 3, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '7.3', title: '7.3 任务三：文本向量化的分布式表示Doc2Vec', taskCount: '2', taskNum: 3, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '7.4', title: '7.4 任务四：文本相似度计算', taskCount: '4', taskNum: 3, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '8.2', title: '8.2 任务二：中文文本聚类', taskCount: '2', taskNum: 3, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '9.1', title: '9.1 任务一：文本情感分析的方法', taskCount: '2', taskNum: 4, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '9.2', title: '9.2 任务二：基于情感词典的文本情感分析', taskCount: '1', taskNum: 3, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-  { num: '9.3', title: '9.3 任务三：基于机器学习的文本情感分析', taskCount: '1', taskNum: 3, knowledgeId: '0', chapterId: '0', workLibraryId: '0' },
-];
-
-module.exports = {
-  KNOWN_CHAPTER_TESTS,
-};
+// 公开版不包含真实章节/题库标识。请通过教师扩展现场识别；旧脚本仅供开发参考。
+const KNOWN_CHAPTER_TESTS = [];
+module.exports = { KNOWN_CHAPTER_TESTS };

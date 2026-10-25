@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ACTION="${1:-all}"
+ACTION="${1:-discover}"
 
 cd "$SCRIPT_DIR"
 

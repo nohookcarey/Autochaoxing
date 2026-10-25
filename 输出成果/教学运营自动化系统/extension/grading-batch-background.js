@@ -91,9 +91,8 @@
       const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
       try {
         const r = await fetch(message.href, { credentials: "include", signal: controller.signal, redirect: "error" });
-        if (!r.ok || Number(r.headers.get("content-length")) > 15000000) throw new Error("附件未获取或超过15MB。");
-        const bytes = new Uint8Array(await r.arrayBuffer());
-        if (bytes.length > 15000000) throw new Error("附件超过15MB。");
+        if (!r.ok) throw new Error("附件未获取。");
+        const bytes = await LearningTongBackgroundUtils.readBoundedResponse(r, 15000000, controller);
         return { ok: true, dataBase64: bytesToBase64(bytes) };
       } finally { clearTimeout(timer); }
     }
