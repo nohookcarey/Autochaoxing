@@ -87,8 +87,7 @@ npm run dry-run -- --input ./data/chapters.example.json
 - `src/lib/config.js`：配置读取
 - `src/lib/data-loader.js`：输入读取与校验
 - `src/lib/xuexitong-client.js`：学习通章节创建主流程
-- `data/chapters.json`：默认输入
-- `data/create-chapter-10.json`：第10章示例数据
+- `data/chapters.example.json`：公开输入示例；复制为本机输入后配置
 - `storage/state.json`：登录态缓存
 - `logs/`：日志与截图
 
@@ -99,8 +98,8 @@ npm run dry-run -- --input ./data/chapters.example.json
 3. 首次登录如出现验证码，需手动完成。
 4. 章节复制依赖学习通编辑器当前行为，如果平台改版，需重新调整。
 
-## 默认可直接使用状态
+## 公开版本配置状态
 
-- `.env` 已写入当前可用登录账密和课程名
-- `storage/state.json` 已保留登录态缓存
+- 公开版本不附带 `.env`；从 `.env.example` 复制后，仅在本机填写所需参数
+- 公开版本不附带登录态；完成本人登录后，缓存仅保存在本机且不得提交
 - 默认主入口改为 `run_chapter_create_workflow.sh`

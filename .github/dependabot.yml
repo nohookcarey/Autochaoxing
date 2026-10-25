@@ -1,17 +1,17 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: "/输出成果/教学运营自动化系统"
+    directory: "/apps/teacher-assistant"
     schedule:
       interval: weekly
     open-pull-requests-limit: 3
   - package-ecosystem: npm
-    directory: "/输出成果/章节创建"
+    directory: "/legacy/chapter-builder"
     schedule:
       interval: monthly
     open-pull-requests-limit: 1
   - package-ecosystem: npm
-    directory: "/输出成果/章节测试批阅"
+    directory: "/legacy/chapter-tests"
     schedule:
       interval: monthly
     open-pull-requests-limit: 1
