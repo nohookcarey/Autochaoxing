@@ -34,7 +34,7 @@
     "pretest": "npm run build"
   },
   "dependencies": {
-    "@tabler/icons-react": "^3.46.0",
+    "@tabler/icons-react": "^3.49.0",
     "@vitejs/plugin-react": "5.0.4",
     "pdfjs-dist": "^4.10.38",
     "react": "19.2.0",
