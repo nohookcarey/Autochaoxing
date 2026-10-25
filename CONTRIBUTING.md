@@ -21,8 +21,9 @@ npm run verify:publication
 仓库根目录运行：
 
 ```sh
-node --test scripts/public-repository.test.mjs
+node --test scripts/*.test.mjs
 node scripts/verify-public-repository.mjs
+node scripts/verify-repository-layout.mjs
 ```
 
 发布从固定 Git 快照构建，安装包只包含 `config/extension-release-files.json` 白名单文件。新增扩展资源时同步更新清单并核验 manifest 引用；不要把本机配置、备份、运行产物或同名副本加入清单。
@@ -35,3 +36,5 @@ node scripts/verify-public-repository.mjs
 - 章节测试总分入口、多题及 Windows Chrome/Edge、Mac 的真实验收。
 - 在无需真实身份信息的前提下提供可复现的附件解析样例。
 - 减少教师配置负担，保持提交前审核与独立回读。
+
+完整源码暂存：在仓库根目录运行 `node scripts/stage-public-repository.mjs /独立空目录`，从当前Git提交导出完整仓库并核验导航与配置；未提交修改和未跟踪文件不会进入快照。主程序旧暂存入口也转到同一流程，不再复制不完整的单模块目录。
