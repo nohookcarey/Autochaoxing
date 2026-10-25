@@ -24,7 +24,7 @@ async function main() {
     await browserGuard.run(async () => {
       const page = await browser.newPage();
       await login(page);
-      await page.goto('https://mooc2-ans.chaoxing.com/mooc2-ans/work/mark?courseid=260169647&clazzid=141397001&id=53393967&cpi=488262137&groupId=0&from=&sort=0&order=0&status=0&pages=1&size=20&topicid=0&backurl=', { waitUntil: 'networkidle' });
+      await page.goto('https://mooc2-ans.chaoxing.com/mooc2-ans/work/mark?courseid=&clazzid=&id=&cpi=&groupId=0&from=&sort=0&order=0&status=0&pages=1&size=20&topicid=0&backurl=', { waitUntil: 'networkidle' });
 
       const labels = ['人工智能1班', '人工智能2班', '人工智能3班', '人工智能4班', '人工智能5班', '人工智能6班'];
       const mapping = {};

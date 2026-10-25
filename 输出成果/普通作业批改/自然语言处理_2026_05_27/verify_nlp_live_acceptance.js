@@ -7,16 +7,16 @@ async (page) => {
   };
 
   try {
-  const COURSE_ID = "260169647";
-  const CPI = "488262137";
+  const COURSE_ID = "";
+  const CPI = "";
   const TARGETS = [
-    { className: "人工智能3班", title: "关键词提取计算作业", workListId: "123535819" },
-    { className: "人工智能4班", title: "关键词提取计算作业", workListId: "123159777" },
-    { className: "人工智能6班", title: "关键词提取计算作业", workListId: "123402582" },
-    { className: "人工智能3班", title: "第五章-复习题", workListId: "122632984" },
-    { className: "人工智能6班", title: "第五章-复习题", workListId: "123035669" },
-    { className: "人工智能3班", title: "任务一", workListId: "116806370" },
-    { className: "人工智能6班", title: "任务一", workListId: "116716284" },
+    { className: "人工智能3班", title: "关键词提取计算作业", workListId: "" },
+    { className: "人工智能4班", title: "关键词提取计算作业", workListId: "" },
+    { className: "人工智能6班", title: "关键词提取计算作业", workListId: "" },
+    { className: "人工智能3班", title: "第五章-复习题", workListId: "" },
+    { className: "人工智能6班", title: "第五章-复习题", workListId: "" },
+    { className: "人工智能3班", title: "任务一", workListId: "" },
+    { className: "人工智能6班", title: "任务一", workListId: "" },
   ];
 
   async function collectItems() {

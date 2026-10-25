@@ -3,8 +3,8 @@
     {
       "courseKey": "demo-course",
       "courseName": "演示课程",
-      "courseId": "100000001",
-      "cpi": "200000001",
+      "courseId": "1001",
+      "cpi": "2001",
       "classNames": ["演示班"],
       "enabledModules": ["assignment"],
       "entryPoints": {

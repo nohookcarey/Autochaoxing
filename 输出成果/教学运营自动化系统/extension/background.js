@@ -1009,12 +1009,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 45000);
       try {
-        const response = await fetch(url, { credentials: "include", signal: controller.signal });
+        const response = await fetch(url, { credentials: "include", signal: controller.signal, redirect: "error" });
         if (!response.ok) {
           sendResponse({ ok: false, reason: `附件下载失败（HTTP ${response.status}），请人工批改。` });
           return;
         }
-        const bytes = new Uint8Array(await response.arrayBuffer());
+        const bytes = await LearningTongBackgroundUtils.readBoundedResponse(response, 15000000, controller);
         sendResponse({ ok: true, dataBase64: bytesToBase64(bytes) });
       } catch (error) {
         if (error?.name === "AbortError") sendResponse({ ok: false, reason: `附件下载超时：${fileName || url.slice(0, 60)}` });

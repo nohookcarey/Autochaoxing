@@ -32,7 +32,7 @@ async function main() {
       console.log('after-login-url:', page.url());
       console.log('after-login-title:', await page.title());
 
-      await page.goto('https://mooc2-ans.chaoxing.com/mooc2-ans/work/mark?courseid=260169647&clazzid=141397001&id=53393967&cpi=488262137&groupId=0&from=&sort=0&order=0&status=0&pages=1&size=20&topicid=0&backurl=', {
+      await page.goto('https://mooc2-ans.chaoxing.com/mooc2-ans/work/mark?courseid=&clazzid=&id=&cpi=&groupId=0&from=&sort=0&order=0&status=0&pages=1&size=20&topicid=0&backurl=', {
         waitUntil: 'domcontentloaded',
       });
       await page.waitForLoadState('networkidle');

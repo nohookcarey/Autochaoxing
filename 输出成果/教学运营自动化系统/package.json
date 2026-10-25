@@ -1,6 +1,6 @@
 {
-  "name": "prototype",
-  "version": "0.0.0",
+  "name": "learningtong-teacher-assistant",
+  "version": "0.41.4",
   "private": true,
   "type": "module",
   "scripts": {
@@ -14,12 +14,12 @@
     "validate:profiles": "node scripts/validate-course-profiles.mjs",
     "test:profiles": "node scripts/validate-course-profiles.mjs tests/fixtures/course-connections.valid.json",
     "gateway": "node server/start-gateway.mjs",
-    "test:gateway": "node --test tests/task-gateway.test.mjs",
+    "test:gateway": "node --test tests/task-gateway.test.mjs tests/gateway-client.test.mjs",
     "test:assignment-scanner": "node scripts/validate-assignment-scanner.mjs && node --test tests/assignment-scanner.test.mjs",
     "test:assistant": "node --test tests/assistant-intents.test.mjs",
     "test:audit": "node --test tests/local-audit.test.mjs",
     "test:demo": "node --test tests/demo-mode.test.mjs tests/demo-workflow.test.mjs tests/agent-blueprint.test.mjs",
-    "test:extension": "node scripts/validate-extension.mjs && node --test tests/extension-assignment-scan.test.mjs tests/extension-chapter-test-scan.test.mjs tests/extension-attendance-scan.test.mjs tests/extension-course-overview-scan.test.mjs tests/extension-score-overview-scan.test.mjs tests/extension-chapter-structure-scan.test.mjs tests/extension-connection-check.test.mjs tests/extension-deadline-update.test.mjs tests/extension-deadline-form.test.mjs tests/extension-demo-mode.test.mjs tests/extension-course-state.test.mjs tests/extension-run-history.test.mjs tests/extension-navigation.test.mjs tests/extension-background-navigation.test.mjs tests/extension-ai-grading.test.mjs tests/extension-ai-grading-background.test.mjs tests/extension-attachment-extract.test.mjs tests/extension-student-scan.test.mjs tests/extension-sheet-filling.test.mjs tests/extension-scan-cache.test.mjs tests/extension-grading-batch.test.mjs tests/extension-grading-teaching.test.mjs tests/extension-teaching-followup.test.mjs tests/extension-grading-report.test.mjs tests/extension-task-design.test.mjs tests/extension-grading-adapter.test.mjs tests/extension-teacher-lifecycle.test.mjs",
+    "test:extension": "node scripts/validate-extension.mjs && node --test tests/extension-assignment-scan.test.mjs tests/extension-chapter-test-scan.test.mjs tests/extension-attendance-scan.test.mjs tests/extension-course-overview-scan.test.mjs tests/extension-score-overview-scan.test.mjs tests/extension-chapter-structure-scan.test.mjs tests/extension-connection-check.test.mjs tests/extension-deadline-update.test.mjs tests/extension-deadline-form.test.mjs tests/extension-demo-mode.test.mjs tests/extension-course-state.test.mjs tests/extension-run-history.test.mjs tests/extension-navigation.test.mjs tests/extension-background-navigation.test.mjs tests/extension-ai-grading.test.mjs tests/extension-ai-grading-background.test.mjs tests/extension-attachment-extract.test.mjs tests/extension-student-scan.test.mjs tests/extension-sheet-filling.test.mjs tests/extension-scan-cache.test.mjs tests/extension-grading-batch.test.mjs tests/extension-grading-teaching.test.mjs tests/extension-teaching-followup.test.mjs tests/extension-grading-report.test.mjs tests/extension-task-design.test.mjs tests/extension-grading-adapter.test.mjs tests/extension-teacher-lifecycle.test.mjs tests/attachment-stream-limit.test.mjs",
     "test:parity": "node scripts/validate-extension-parity.mjs",
     "verify:release": "node scripts/verify-extension-release.mjs",
     "test:batch": "node --test tests/extension-grading-batch.test.mjs tests/extension-grading-teaching.test.mjs",
@@ -29,7 +29,7 @@
     "test:codex": "node --test tests/codex-bridge.test.mjs",
     "codex:bridge": "node scripts/start-codex-bridge.mjs",
     "test:lifecycle": "node --test tests/extension-teacher-lifecycle.test.mjs",
-    "test:publication": "node --test tests/publication.test.mjs",
+    "test:publication": "node --test tests/publication.test.mjs tests/extension-release-allowlist.test.mjs",
     "verify:publication": "node scripts/verify-publication.mjs",
     "pretest": "npm run build"
   },
@@ -43,5 +43,6 @@
   },
   "engines": {
     "node": ">=22"
-  }
+  },
+  "license": "MIT"
 }

@@ -1,3 +1,4 @@
+throw new Error("历史定向写入脚本已停用。请使用教师扩展重新扫描、确认评分卡并审核提交。");
 const { chromium } = require('playwright');
 const { configurePage, getTimeoutConfig, withRetries, withTaskFuse } = require('./browser_timeout_config');
 const {
@@ -7,14 +8,14 @@ const {
 } = require('./graceful_browser_exit');
 
 const LOGIN_URL = 'https://passport2.chaoxing.com/login?fid=12&refer=http%3A%2F%2Fi.chaoxing.com%2Fbase%3Fvflag%3Dtrue%26fid%3D%26backUrl%3D&space=2';
-const COURSE_ID = '260169647';
-const CPI = '488262137';
-const CHAPTER_ID = '1173054653';
-const WORK_LIBRARY_ID = 'df222f30cb6f4a3992bdcd97ee64d3b4';
+const COURSE_ID = '';
+const CPI = '';
+const CHAPTER_ID = '';
+const WORK_LIBRARY_ID = '';
 const TARGET_CLASSES = [
-  { label: '人工智能3班', id: '141396990' },
-  { label: '人工智能4班', id: '141396996' },
-  { label: '人工智能6班', id: '141397008' },
+  { label: '人工智能3班', id: '' },
+  { label: '人工智能4班', id: '' },
+  { label: '人工智能6班', id: '' },
 ];
 const TIMEOUTS = getTimeoutConfig();
 

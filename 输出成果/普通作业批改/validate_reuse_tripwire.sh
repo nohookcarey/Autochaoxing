@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-WORKFLOW_FILE="/Users/careynohook/Documents/Obsidian Vault/01-工作流/工作流-学习通作业批改.md"
+WORKFLOW_FILE="${XTX_WORKFLOW_FILE:-}"
 README_FILE="${SCRIPT_DIR}/README.md"
 COURSE_CONTEXT_FILE="${SCRIPT_DIR}/course_context.md"
 

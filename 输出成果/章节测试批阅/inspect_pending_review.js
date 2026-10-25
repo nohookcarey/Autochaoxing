@@ -24,7 +24,7 @@ async function main() {
     await browserGuard.run(async () => {
       const page = await browser.newPage();
       await login(page);
-      const url = 'https://mooc2-ans.chaoxing.com/mooc2-ans/work/library/review-work?courseid=260169647&clazzid=141396996&workId=53457437&workAnswerId=57077142&groupId=0&from=&sort=0&order=0&status=0&pages=1&size=20&topicid=0';
+      const url = 'https://mooc2-ans.chaoxing.com/mooc2-ans/work/library/review-work?courseid=&clazzid=&workId=&workAnswerId=&groupId=0&from=&sort=0&order=0&status=0&pages=1&size=20&topicid=0';
       await page.goto(url, { waitUntil: 'networkidle' });
       const visibleInputs = await page.locator('input').evaluateAll((els) => els.map((el, i) => {
         const style = window.getComputedStyle(el);

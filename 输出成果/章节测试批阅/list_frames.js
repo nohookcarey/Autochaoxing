@@ -6,7 +6,7 @@ const {
 } = require('./graceful_browser_exit');
 
 const LOGIN_URL = 'https://passport2.chaoxing.com/login?fid=12&refer=http%3A%2F%2Fi.chaoxing.com%2Fbase%3Fvflag%3Dtrue%26fid%3D%26backUrl%3D&space=2';
-const COURSE_URL = 'https://mooc2-ans.chaoxing.com/mooc2-ans/mycourse/tch?courseid=260169647&clazzid=141397001&cpi=488262137&enc=a8d9fd2f3f8e5cf245d2a37de329e574&t=1779126525125&pageHeader=2&v=2&hideHead=0&perspectiveType=';
+const COURSE_URL = 'https://mooc2-ans.chaoxing.com/mooc2-ans/mycourse/tch?courseid=&clazzid=&cpi=&enc=a8d9fd2f3f8e5cf245d2a37de329e574&t=1779126525125&pageHeader=2&v=2&hideHead=0&perspectiveType=';
 
 async function login(page) {
   await page.goto(LOGIN_URL, { waitUntil: 'domcontentloaded' });

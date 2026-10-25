@@ -43,5 +43,32 @@
     return latestIsAnotherCourseShell ? matchingShell : latest;
   }
 
-  globalThis.LearningTongBackgroundUtils = { aggregateFrameResults, isChaoxingPage, pickTargetTab };
+  async function readBoundedResponse(response, limit = 15000000, controller) {
+    const fail = () => new Error("附件超过15MB或未取得可限量读取的材料，请人工复核。");
+    if (!response.body?.getReader) { controller?.abort(); throw fail(); }
+    const reader = response.body.getReader();
+    let bytes = new Uint8Array(Math.min(limit, 65536));
+    let total = 0;
+    try {
+      if (Number(response.headers.get("content-length")) > limit) throw fail();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (!ArrayBuffer.isView(value) || value.BYTES_PER_ELEMENT !== 1 || value.byteLength > limit - total) throw fail();
+        const needed = total + value.byteLength;
+        if (needed > bytes.byteLength) {
+          const grown = new Uint8Array(Math.min(limit, Math.max(needed, bytes.byteLength * 2)));
+          grown.set(bytes); bytes = grown;
+        }
+        bytes.set(value, total); total = needed;
+      }
+      return bytes.slice(0, total);
+    } catch (error) {
+      try { await reader.cancel(); } catch {}
+      controller?.abort();
+      throw error;
+    } finally { reader.releaseLock(); }
+  }
+
+  globalThis.LearningTongBackgroundUtils = { aggregateFrameResults, isChaoxingPage, pickTargetTab, readBoundedResponse };
 })();

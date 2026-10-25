@@ -1,3 +1,4 @@
+import { gatewayFetch } from "./gateway-client.mjs";
 import { useEffect, useMemo, useState } from "react";
 import DemoWalkthrough from "./DemoWalkthrough";
 import IconAlertTriangle from "@tabler/icons-react/dist/esm/icons/IconAlertTriangle.mjs";
@@ -156,7 +157,7 @@ function SettingsPage({ activeCourse, demoMode, onConfigured, onToggleDemoMode }
   });
   async function loadProfiles() {
     try {
-      const response = await fetch("http://127.0.0.1:4174/api/course-profiles");
+      const response = await gatewayFetch("/api/course-profiles");
       const result = await response.json();
       const currentProfiles = result.profiles ?? [];
       setProfiles(currentProfiles);
@@ -174,7 +175,7 @@ function SettingsPage({ activeCourse, demoMode, onConfigured, onToggleDemoMode }
     const nextProfile = { courseKey: activeCourse.key, courseName: activeCourse.name, courseId: draft.courseId.trim(), cpi: draft.cpi.trim(), classNames, enabledModules: availableModules(activeCourse), entryPoints: { assignment: draft.entryPoint.trim() } };
     const nextProfiles = profiles.some((item) => item.courseKey === activeCourse.key) ? profiles.map((item) => item.courseKey === activeCourse.key ? nextProfile : item) : [...profiles, nextProfile];
     try {
-      const response = await fetch("http://127.0.0.1:4174/api/course-profiles", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ profiles: nextProfiles }) });
+      const response = await gatewayFetch("/api/course-profiles", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ profiles: nextProfiles }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "本机配置未保存。");
       setProfiles(result.profiles);
@@ -209,7 +210,7 @@ export function App() {
   useEffect(() => {
     if (demoMode) return undefined;
     let active = true;
-    fetch("http://127.0.0.1:4174/api/course-profiles")
+    gatewayFetch("/api/course-profiles")
       .then((response) => response.json())
       .then((result) => { if (active && Array.isArray(result.profiles) && result.profiles.length) setCourses((current) => mergeCourseProfiles(current, result.profiles)); })
       .catch(() => undefined);
@@ -297,7 +298,7 @@ export function App() {
     let state = preflight.state;
     let detail = "";
     try {
-      const response = await fetch("http://127.0.0.1:4174/api/tasks/assignment-preflight", {
+      const response = await gatewayFetch("/api/tasks/assignment-preflight", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ courseKey: activeCourse.key }),

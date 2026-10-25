@@ -14,7 +14,7 @@ async (page) => {
   const CONFIG = {
     courseWorkListUrl:
       ENV.XTX_DEADLINE_COURSE_WORK_LIST_URL ||
-      "https://mooc2-ans.chaoxing.com/mooc2-ans/work/list?courseid=260169647&selectClassid=0&cpi=488262137&v=0",
+      "https://mooc2-ans.chaoxing.com/mooc2-ans/work/list?courseid=&selectClassid=0&cpi=&v=0",
     targetClasses: [],
   };
 

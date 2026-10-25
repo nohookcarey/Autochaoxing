@@ -1,3 +1,4 @@
+throw new Error("历史定向写入脚本已停用。请使用教师扩展重新扫描、确认评分卡并审核提交。");
 const { chromium } = require('playwright');
 const { configurePage, getTimeoutConfig, withRetries, withTaskFuse } = require('./browser_timeout_config');
 const { login, TARGET_CLASSES, makeMarkUrl } = require('./chaoxing_helpers');

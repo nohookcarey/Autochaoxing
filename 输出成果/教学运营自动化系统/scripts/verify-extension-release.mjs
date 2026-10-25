@@ -1,3 +1,4 @@
+import { publicationPatterns } from "./verify-publication.mjs";
 import { createHash } from "node:crypto";
 import { readFile, readdir } from "node:fs/promises";
 import { join, relative, resolve, sep } from "node:path";
@@ -14,14 +15,7 @@ const sanitizedProfiles = new Map([
   ["attendance-profiles.local.js", "globalThis.LearningTongAttendanceProfiles = [];\n"],
 ]);
 
-const forbiddenPatterns = [
-  /courseid=\d+/i,
-  /clazzid=\d+/i,
-  /\bcpi=\d+/i,
-  /\b\d{12,}\b/,
-  /cookie\s*[:=]/i,
-  /password\s*[:=]/i,
-];
+const forbiddenPatterns = publicationPatterns.map(([,pattern]) => pattern);
 
 async function listFiles(directory, root = directory) {
   const entries = (await readdir(directory, { withFileTypes: true })).filter((entry) => entry.name !== ".DS_Store");
@@ -38,7 +32,7 @@ function sha256(buffer) {
   return createHash("sha256").update(buffer).digest("hex");
 }
 
-const sourceFiles = await listFiles(sourceDir);
+const sourceFiles = JSON.parse(await readFile(resolve("config/extension-release-files.json"), "utf8")).files.sort();
 const releaseFiles = await listFiles(releaseDir);
 const expectedReleaseFiles = [...new Set([...sourceFiles, "README.md"])].sort();
 
@@ -48,6 +42,7 @@ const hashMismatches = [];
 const privacyMatches = [];
 
 for (const file of sourceFiles) {
+  if (missingFiles.includes(file)) continue;
   const releaseBuffer = await readFile(join(releaseDir, file));
   if (sanitizedProfiles.has(file)) {
     const expected = sanitizedProfiles.get(file);
