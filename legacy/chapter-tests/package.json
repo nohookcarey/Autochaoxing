@@ -11,7 +11,7 @@
     "fix:zero:known": "node fix_zero_scores_known.js"
   },
   "dependencies": {
-    "playwright": "1.55.1"
+    "playwright": "1.64.1"
   },
   "license": "MIT"
 }
