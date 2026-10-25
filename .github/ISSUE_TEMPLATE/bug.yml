@@ -1,0 +1,24 @@
+name: 使用问题 / 页面兼容
+description: 用脱敏步骤帮助复现
+title: "[使用问题] "
+body:
+  - type: markdown
+    attributes:
+      value: "漏洞请走私密报告。不要上传学生原件、身份、逐人成绩、密钥、Cookie 或完整课程链接。"
+  - type: input
+    id: version
+    attributes:
+      label: 扩展版本、浏览器及系统
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 操作步骤、预期与实际结果
+      description: 优先使用演示数据，学校名称可选。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 脱敏证据（可选）

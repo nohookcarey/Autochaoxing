@@ -24,7 +24,7 @@ async function main() {
     await browserGuard.run(async () => {
       const page = await browser.newPage();
       await login(page);
-      await page.goto('https://mooc2-ans.chaoxing.com/mooc2-ans/work/mark?courseid=0&clazzid=0&id=0&cpi=0&groupId=0&from=&sort=0&order=0&status=0&pages=1&size=20&topicid=0&backurl=', { waitUntil: 'networkidle' });
+      await page.goto('https://mooc2-ans.chaoxing.com/mooc2-ans/work/mark?courseid=&clazzid=&id=&cpi=&groupId=0&from=&sort=0&order=0&status=0&pages=1&size=20&topicid=0&backurl=', { waitUntil: 'networkidle' });
 
       const info = await page.evaluate(() => {
         const view = Array.from(document.querySelectorAll('a')).find(a => a.textContent.trim() === '查看');

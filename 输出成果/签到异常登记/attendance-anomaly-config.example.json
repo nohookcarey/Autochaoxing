@@ -1,22 +1,22 @@
 {
   "course": {
-    "courseId": "0",
-    "clazzId": "0",
-    "cpi": "0",
-    "url": "https://mooc2-ans.chaoxing.com/mooc2-ans/mycourse/tch?courseid=0&clazzid=0&cpi=0"
+    "courseId": "",
+    "clazzId": "",
+    "cpi": "",
+    "url": "https://mooc2-ans.chaoxing.com/mooc2-ans/mycourse/tch?courseid=&clazzid=&cpi="
   },
   "classes": [
     {
-      "name": "2024人工智能1班",
-      "classId": "0",
-      "sheetPath": "/ABS/PATH/2024人工智能1班-课堂考核及成绩记载表.xls",
-      "outputPath": "/ABS/PATH/2024人工智能1班-课堂考核及成绩记载表-已填写签到异常.xls"
+      "name": "示例班A",
+      "classId": "",
+      "sheetPath": "/ABS/PATH/示例班A-课堂考核及成绩记载表.xls",
+      "outputPath": "/ABS/PATH/示例班A-课堂考核及成绩记载表-已填写签到异常.xls"
     },
     {
-      "name": "2024人工智能2班",
-      "classId": "0",
-      "sheetPath": "/ABS/PATH/2024人工智能2班-课堂考核及成绩记载表.xls",
-      "outputPath": "/ABS/PATH/2024人工智能2班-课堂考核及成绩记载表-已填写签到异常.xls"
+      "name": "示例班B",
+      "classId": "",
+      "sheetPath": "/ABS/PATH/示例班B-课堂考核及成绩记载表.xls",
+      "outputPath": "/ABS/PATH/示例班B-课堂考核及成绩记载表-已填写签到异常.xls"
     }
   ],
   "symbolMap": {

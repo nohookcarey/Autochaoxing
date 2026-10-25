@@ -1,4 +1,5 @@
 async (page) => {
+  if (globalThis.process?.env?.XTX_ENABLE_LEGACY_WRITES !== "reviewed") throw new Error("旧版写入入口默认停用；请先审查脚本并明确配置本次范围，推荐使用教师扩展。");
   const isBrowserClosedError = (error) => {
     const message = String(error?.message || error || '');
     return /Target page, context or browser has been closed/i.test(message)
@@ -14,7 +15,7 @@ async (page) => {
   const CONFIG = {
     courseWorkListUrl:
       ENV.XTX_DEADLINE_COURSE_WORK_LIST_URL ||
-      "https://mooc2-ans.chaoxing.com/mooc2-ans/work/list?courseid=0&selectClassid=0&cpi=0&v=0",
+      "https://mooc2-ans.chaoxing.com/mooc2-ans/work/list?courseid=&selectClassid=0&cpi=&v=0",
     targetDate: "2026-06-03",
     keepOriginalTime: true,
     expectedTitle: "",

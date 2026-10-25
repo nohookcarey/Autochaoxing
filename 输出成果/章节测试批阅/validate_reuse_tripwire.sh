@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-WORKFLOW_FILE="/LOCAL/Documents/Obsidian Vault/01-工作流/工作流-章节测试批阅.md"
+WORKFLOW_FILE="${XTX_WORKFLOW_FILE:-}"
 README_FILE="${SCRIPT_DIR}/README.md"
 COURSE_CONTEXT_FILE="${SCRIPT_DIR}/nlp_chapter_course_context.md"
 
@@ -75,9 +75,9 @@ const missing = expectedNums.filter((num) => !nums.includes(num));
 const duplicates = nums.filter((num, index) => nums.indexOf(num) !== index);
 const invalid = KNOWN_CHAPTER_TESTS.filter((item) => !item.chapterId || !item.workLibraryId || !item.taskNum);
 
-if (helpers.COURSE_ID !== "260169647") throw new Error(`courseId 不一致: ${helpers.COURSE_ID}`);
-if (helpers.CPI !== "488262137") throw new Error(`cpi 不一致: ${helpers.CPI}`);
-if (helpers.PRIMARY_CLASS_ID !== "141397001") throw new Error(`primaryClassId 不一致: ${helpers.PRIMARY_CLASS_ID}`);
+if (helpers.COURSE_ID !== "") throw new Error(`courseId 不一致: ${helpers.COURSE_ID}`);
+if (helpers.CPI !== "") throw new Error(`cpi 不一致: ${helpers.CPI}`);
+if (helpers.PRIMARY_CLASS_ID !== "") throw new Error(`primaryClassId 不一致: ${helpers.PRIMARY_CLASS_ID}`);
 if (!Array.isArray(helpers.TARGET_CLASSES) || helpers.TARGET_CLASSES.length !== 3) {
   throw new Error("班级白名单数量不正确");
 }
@@ -85,8 +85,8 @@ if (missing.length) throw new Error(`KNOWN_CHAPTER_TESTS 缺少章节: ${missing
 if (duplicates.length) throw new Error(`KNOWN_CHAPTER_TESTS 有重复章节: ${duplicates.join(", ")}`);
 if (invalid.length) throw new Error(`KNOWN_CHAPTER_TESTS 存在缺少入口字段的章节: ${invalid.map((item) => item.num).join(", ")}`);
 NODE
-rg -q '260169647' "$COURSE_CONTEXT_FILE"
-rg -q '488262137' "$COURSE_CONTEXT_FILE"
+rg -q '' "$COURSE_CONTEXT_FILE"
+rg -q '' "$COURSE_CONTEXT_FILE"
 rg -q '人工智能3班' "$COURSE_CONTEXT_FILE"
 rg -q '人工智能4班' "$COURSE_CONTEXT_FILE"
 rg -q '人工智能6班' "$COURSE_CONTEXT_FILE"

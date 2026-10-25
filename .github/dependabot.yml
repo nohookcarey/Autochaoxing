@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/输出成果/教学运营自动化系统"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+  - package-ecosystem: npm
+    directory: "/输出成果/章节创建"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 1
+  - package-ecosystem: npm
+    directory: "/输出成果/章节测试批阅"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 1

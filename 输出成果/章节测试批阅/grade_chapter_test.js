@@ -13,6 +13,7 @@ const {
 } = require('./chaoxing_helpers');
 
 async function main() {
+  if (process.env.XTX_ENABLE_LEGACY_WRITES !== "reviewed") throw new Error("旧版批阅默认停用，请使用教师扩展或先审查并明确配置本次范围。");
   const browser = await chromium.launch({
     channel: 'chrome',
     headless: process.env.HEADLESS === 'true',

@@ -1,4 +1,5 @@
 async (page) => {
+  throw new Error("历史定向写入脚本已停用。请使用教师扩展重新扫描、确认评分卡并审核提交。");
   const isBrowserClosedError = (error) => {
     const message = String(error?.message || error || '');
     return /Target page, context or browser has been closed/i.test(message)
@@ -9,33 +10,33 @@ async (page) => {
   try {
   const ASSIGNMENTS = [
     {
-      courseId: "0",
-      cpi: "0",
-      workListId: "0",
+      courseId: "",
+      cpi: "",
+      workListId: "",
       title: "关键词提取计算作业",
     },
     {
-      courseId: "0",
-      cpi: "0",
-      workListId: "0",
+      courseId: "",
+      cpi: "",
+      workListId: "",
       title: "关键词提取计算作业",
     },
     {
-      courseId: "0",
-      cpi: "0",
-      workListId: "0",
+      courseId: "",
+      cpi: "",
+      workListId: "",
       title: "关键词提取计算作业",
     },
     {
-      courseId: "0",
-      cpi: "0",
-      workListId: "0",
+      courseId: "",
+      cpi: "",
+      workListId: "",
       title: "任务一",
     },
     {
-      courseId: "0",
-      cpi: "0",
-      workListId: "0",
+      courseId: "",
+      cpi: "",
+      workListId: "",
       title: "任务一",
     },
   ];

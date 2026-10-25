@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 私密漏洞或隐私暴露报告
+    url: https://github.com/nohookcarey/Autochaoxing/security/advisories/new
+    about: 不要公开漏洞细节或个人资料。

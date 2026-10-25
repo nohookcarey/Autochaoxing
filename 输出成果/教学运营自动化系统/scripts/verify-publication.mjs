@@ -5,9 +5,10 @@ import {pathToFileURL} from 'node:url';
 
 const skip=new Set(['.git','node_modules','dist','release','coverage']);
 const localPath=/(?:^|\/)(?:\.backup-[^/]*|tmp|\.DS_Store|\.env(?:\..*)?|[^/]+\.(?:pem|key))$|^config\/[^/]+\.local\.json$/;
-const patterns=[
- ['personal-path',/\/Users\/[^/\s<>{}"']+\//],
- ['platform-identity',/[?&](?:courseid|clazzid|cpi|workid|workanswerid)=\d{5,}/i],
+export const publicationPatterns=[
+ ['personal-path',/\/Users\/[^/\s<>{}"']+\/|[A-Z]:\\Users\\[^\\\s<>%"']+\\/i],
+ ['platform-identity',/(?:[?&]|%26|%3[fF])(?:courseid|clazzid|classid|cpi|workid|workanswerid|knowledgeid|chapterid|worklibraryid|uid|puid|userid|id)(?:=|%3[dD])(?:\d{5,}|[a-f\d]{32})\b/i],
+ ['platform-config',/\b(?:course_?id|clazz_?id|class_?id|work_?list_?id|work_?id|work_?answer_?id|knowledge_?id|chapter_?id|work_?library_?id|answer_?id|student_?id|teacher_?id|cpi|puid|uid)["'`\s]*(?::|=|\|\|)[\s"'`]*(?:\d{5,}|[a-f\d]{32})\b/i],
  ['credential',/\b(?:gh[opusr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{25,}|sk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,})\b/],
  ['private-key',/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/],
 ];
@@ -23,7 +24,7 @@ export async function verifyPublication(directory){
   if(localPath.test(path)){issues.push({path,rule:'local-only-file'});continue;}
   if(entry.isDirectory()){await walk(full);continue;}if(!entry.isFile())continue;files.push(path);
   if(!/\.(?:js|mjs|jsx|json|md|html|css|yml|yaml|cmd|command|txt)$/i.test(path)||path.startsWith('extension/vendor/'))continue;
-  const content=await readFile(full,'utf8');for(const [rule,pattern]of patterns)if(pattern.test(content))issues.push({path,rule});
+  const content=await readFile(full,'utf8');for(const [rule,pattern]of publicationPatterns)if(pattern.test(content))issues.push({path,rule});
  }}
  await walk(root);
  for(const [path,expected]of Object.entries(profiles)){

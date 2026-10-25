@@ -1,0 +1,19 @@
+name: 版权 / 内容处理
+description: 仅提交公开链接与非敏感说明
+title: "[内容处理] "
+body:
+  - type: markdown
+    attributes:
+      value: "此 Issue 完全公开。非公开证据勿上传；正式版权主张请阅读 RIGHTS.md 中的 GitHub 官方渠道。隐私暴露走私密漏洞报告。"
+  - type: input
+    id: link
+    attributes:
+      label: 已公开的仓库文件链接
+    validations:
+      required: true
+  - type: textarea
+    id: claim
+    attributes:
+      label: 非敏感权利依据概要及期望处理方式
+    validations:
+      required: true

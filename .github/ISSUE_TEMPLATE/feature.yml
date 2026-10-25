@@ -1,0 +1,17 @@
+name: 教师需求建议
+description: 说明实际教学任务与完成标准
+title: "[需求] "
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: 什么任务遇到了什么困难？
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 怎样才算完成？
+      description: 说明输入和期望输出，勿附真实学生资料。
+    validations:
+      required: true

@@ -1,4 +1,5 @@
 async (page) => {
+  if (globalThis.process?.env?.XTX_ENABLE_LEGACY_WRITES !== "reviewed") throw new Error("旧版写入入口默认停用；请先审查脚本并明确配置本次范围，推荐使用教师扩展。");
   const isBrowserClosedError = (error) => {
     const message = String(error?.message || error || '');
     return /Target page, context or browser has been closed/i.test(message)

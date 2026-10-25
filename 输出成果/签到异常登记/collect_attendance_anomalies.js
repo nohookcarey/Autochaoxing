@@ -14,7 +14,6 @@ if (!CONFIG_PATH) {
 function loadPlaywright() {
   const candidates = [
     process.env.XTX_PLAYWRIGHT_MODULE_PATH,
-    '/LOCAL/Documents/Codex/脚本仓库/学习通/章节测试批阅/章节测试批阅脚本_2026-05-19/node_modules/playwright',
     'playwright',
   ].filter(Boolean);
 
@@ -32,7 +31,7 @@ const CHROME_PATH =
   process.env.XTX_CHROME_EXECUTABLE ||
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const TEACH_DATA_URL =
-  'https://stat2-ans.chaoxing.com/teach-data/index?courseid=0&clazzid=0&cpi=0&ut=t&pEnc=';
+  'https://stat2-ans.chaoxing.com/teach-data/index?courseid=&clazzid=&cpi=&ut=t&pEnc=';
 const RAW_STATUS_BY_CODE = {
   '5': '缺勤',
   '7': '病假',
