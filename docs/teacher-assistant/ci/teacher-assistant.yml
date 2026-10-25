@@ -1,10 +1,10 @@
 name: Teacher assistant checks
 on:
   pull_request:
-    paths: ['输出成果/教学运营自动化系统/**', '.github/workflows/teacher-assistant.yml']
+    paths: ['apps/teacher-assistant/**', '.github/workflows/teacher-assistant.yml']
   push:
     branches: [main]
-    paths: ['输出成果/教学运营自动化系统/**', '.github/workflows/teacher-assistant.yml']
+    paths: ['apps/teacher-assistant/**', '.github/workflows/teacher-assistant.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 15
     defaults:
       run:
-        working-directory: 输出成果/教学运营自动化系统
+        working-directory: apps/teacher-assistant
     env:
       EXTENSION_RELEASE_DIR: ${{ runner.temp }}/teacher-assistant-extension
     steps:
@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: 输出成果/教学运营自动化系统/package-lock.json
+          cache-dependency-path: apps/teacher-assistant/package-lock.json
           registry-url: https://registry.npmjs.org
       - run: npm ci --registry=https://registry.npmjs.org
       - run: npm test

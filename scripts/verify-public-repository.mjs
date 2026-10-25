@@ -18,7 +18,7 @@ const skipped = new Set([".git", "node_modules", "dist", "release", "coverage"])
 export async function verifyPublicRepository(directory, { gitInventory = false } = {}) {
   const root = resolve(directory), issues = [];
   const verifiedVendor = new Set();
-  const modulePath = "输出成果/教学运营自动化系统/";
+  const modulePath = "apps/teacher-assistant/";
   try {
     const integrity = JSON.parse(await readFile(join(root, modulePath, "config/vendor-integrity.json"), "utf8"));
     for (const item of integrity.files) {

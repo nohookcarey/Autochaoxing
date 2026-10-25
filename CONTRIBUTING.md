@@ -10,7 +10,7 @@
 
 ## 开发
 
-使用 Node.js 22+。在 `输出成果/教学运营自动化系统` 中运行：
+使用 Node.js 22+。在 `apps/teacher-assistant` 中运行：
 
 ```sh
 npm ci
